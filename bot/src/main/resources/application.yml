@@ -1,0 +1,10 @@
+app:
+  telegram-token: ${TOKEN}
+  scrapper-client-base-url: http://localhost:8081
+
+spring:
+  application:
+    name: bot
+
+server:
+  port: 8080
