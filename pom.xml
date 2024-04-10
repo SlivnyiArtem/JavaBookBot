@@ -20,9 +20,11 @@
     <maven.compiler.target>21</maven.compiler.target>
 
     <spring-boot.version>3.2.4</spring-boot.version>
-    <java-telegram-bot-api.version>7.0.1</java-telegram-bot-api.version>
+    <telegrambots.version>6.9.7.1</telegrambots.version>
     <postgresql.version>42.7.3</postgresql.version>
+    <h2.version>2.2.224</h2.version>
     <junit.version>3.8.1</junit.version>
+    <jaxb-api.version>2.3.0</jaxb-api.version>
   </properties>
 
   <dependencyManagement>
@@ -48,9 +50,9 @@
       </dependency>
 
       <dependency>
-        <groupId>com.github.pengrad</groupId>
-        <artifactId>java-telegram-bot-api</artifactId>
-        <version>${java-telegram-bot-api.version}</version>
+        <groupId>org.telegram</groupId>
+        <artifactId>telegrambots</artifactId>
+        <version>${telegrambots.version}</version>
       </dependency>
 
       <!-- Database -->
@@ -64,6 +66,20 @@
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
         <version>${postgresql.version}</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>javax.xml.bind</groupId>
+        <artifactId>jaxb-api</artifactId>
+        <version>${jaxb-api.version}</version>
+      </dependency>
+
+      <!-- test db -->
+
+      <dependency>
+        <groupId>com.h2database</groupId>
+        <artifactId>h2</artifactId>
+        <version>${h2.version}</version>
         <scope>runtime</scope>
       </dependency>
 
