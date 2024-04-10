@@ -1,9 +1,6 @@
 package ru.urfu.bot.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -11,6 +8,12 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 public class User {
+
+    public User(String userName) {
+        this.userName = userName;
+    }
+
+    public User() { }
 
     public Long getUserId() {
         return userId;
@@ -20,9 +23,19 @@ public class User {
         return chats;
     }
 
+    public String getUserName() {
+        return userName;
+    }
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
+
+    @Column(unique = true)
+    private String userName;
 
     @OneToMany(mappedBy = "user")
     private final Set<Chat> chats = new HashSet<>();
+
+
 }
