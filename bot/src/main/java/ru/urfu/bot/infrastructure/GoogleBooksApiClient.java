@@ -1,13 +1,13 @@
 package ru.urfu.bot.infrastructure;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import ru.urfu.bot.app.BookApiClient;
 
 import java.util.List;
 
-@Service
+@Component
 public class GoogleBooksApiClient implements BookApiClient {
 
     private final String apiKey;
@@ -24,6 +24,6 @@ public class GoogleBooksApiClient implements BookApiClient {
         return webClient.get()
                 .uri("/volumes?q={name}", name)
                 .retrieve()
-                .bodyToMono(List.class);
+                .bodyToMono(Object.class).log();
     }
 }

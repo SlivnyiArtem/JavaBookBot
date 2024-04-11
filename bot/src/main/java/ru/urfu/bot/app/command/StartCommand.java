@@ -28,14 +28,16 @@ public class StartCommand implements Command {
         String userName = update.getMessage().getChat().getUserName();
         Long chatId = update.getMessage().getChatId();
 
-        User user = userRepository.findByUserName(userName).orElse(new User(userName));
-        Chat chat = chatRepository.findById(chatId).orElse(new Chat(chatId));
+        if (chatRepository.findById(chatId).isEmpty()) {
+            User user = userRepository.findByUserName(userName).orElse(new User(userName));
+            Chat chat = new Chat(chatId);
 
-        user.getChats().add(chat);
-        chat.setUser(user);
+            user.getChats().add(chat);
+            chat.setUser(user);
 
-        userRepository.save(user);
-        chatRepository.save(chat);
+            userRepository.save(user);
+            chatRepository.save(chat);
+        }
 
         return new SendMessage(chatId.toString(), "Bot started");
     }

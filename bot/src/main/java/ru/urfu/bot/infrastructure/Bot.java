@@ -11,7 +11,6 @@ import ru.urfu.bot.app.UserMessageProcessor;
 @Component
 public class Bot extends TelegramLongPollingBot {
 
-
     private final String userName;
 
     private final UserMessageProcessor userMessageProcessor;
@@ -19,11 +18,11 @@ public class Bot extends TelegramLongPollingBot {
 
     public Bot(
             TelegramBotsApi telegramBotsApi,
-            BotProperties config,
+            BotProperties properties,
             UserMessageProcessor userMessageProcessor) throws TelegramApiException {
 
-        super(config.telegramToken());
-        this.userName = config.telegramBotName();
+        super(properties.telegramToken());
+        this.userName = properties.telegramBotName();
         this.userMessageProcessor = userMessageProcessor;
         telegramBotsApi.registerBot(this);
     }
