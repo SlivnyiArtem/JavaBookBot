@@ -24,6 +24,7 @@
     <postgresql.version>42.7.3</postgresql.version>
     <h2.version>2.2.224</h2.version>
     <junit.version>3.8.1</junit.version>
+    <archunit-junit5.version>1.2.1</archunit-junit5.version>
     <jaxb-api.version>2.3.0</jaxb-api.version>
   </properties>
 
@@ -55,6 +56,12 @@
         <version>${telegrambots.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-webflux</artifactId>
+        <version>${spring-boot.version}</version>
+      </dependency>
+
       <!-- Database -->
 
       <dependency>
@@ -83,10 +90,18 @@
         <scope>runtime</scope>
       </dependency>
 
+      <!-- Tests -->
+
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
         <version>${junit.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.tngtech.archunit</groupId>
+        <artifactId>archunit-junit5</artifactId>
+        <version>${archunit-junit5.version}</version>
         <scope>test</scope>
       </dependency>
     </dependencies>

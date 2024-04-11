@@ -8,8 +8,6 @@ import ru.urfu.bot.app.JpaUserRepository;
 import ru.urfu.bot.domain.Chat;
 import ru.urfu.bot.domain.User;
 
-import java.util.Optional;
-
 @Component
 public class StartCommand implements Command {
 

@@ -15,6 +15,8 @@ public record BotProperties(
         @NotEmpty
         String telegramBotName,
         @NotEmpty
-        String scrapperClientBaseUrl
+        String apiKey,
+        @NotEmpty
+        String bookApiBaseUrl
 ) {
 }
