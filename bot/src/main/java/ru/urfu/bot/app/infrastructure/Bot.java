@@ -1,4 +1,4 @@
-package ru.urfu.bot.infrastructure;
+package ru.urfu.bot.app.infrastructure;
 
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -6,8 +6,13 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import ru.urfu.bot.app.UserMessageProcessor;
+import ru.urfu.bot.app.config.BotProperties;
+import ru.urfu.bot.app.domain.services.UserMessageProcessor;
 
+
+/**
+ * Telegram-Bot
+ */
 @Component
 public class Bot extends TelegramLongPollingBot {
 

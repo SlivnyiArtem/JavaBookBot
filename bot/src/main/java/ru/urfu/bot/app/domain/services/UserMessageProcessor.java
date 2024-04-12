@@ -1,9 +1,13 @@
-package ru.urfu.bot.app;
+package ru.urfu.bot.app.domain.services;
 
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import ru.urfu.bot.app.command.*;
+import ru.urfu.bot.app.domain.handlers.Command;
+import ru.urfu.bot.app.domain.handlers.books.AddBookCommand;
+import ru.urfu.bot.app.domain.handlers.books.PrintBooksCommand;
+import ru.urfu.bot.app.domain.handlers.books.SearchBookCommand;
+import ru.urfu.bot.app.domain.handlers.bot.StartBotCommand;
 
 import java.util.Map;
 
@@ -13,11 +17,11 @@ public class UserMessageProcessor {
     private final Map<String, Command> commands;
 
     public UserMessageProcessor(
-            StartCommand startCommand, SearchBookCommand searchBookCommand,
+            StartBotCommand startBotCommand, SearchBookCommand searchBookCommand,
             AddBookCommand addBookCommand, PrintBooksCommand printBooksCommand) {
 
         this.commands = Map.of(
-                "/start", startCommand,
+                "/start", startBotCommand,
                 "/search_book", searchBookCommand,
                 "/add_book", addBookCommand,
                 "/my_books", printBooksCommand

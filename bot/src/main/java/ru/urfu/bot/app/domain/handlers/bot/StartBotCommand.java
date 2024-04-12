@@ -1,21 +1,22 @@
-package ru.urfu.bot.app.command;
+package ru.urfu.bot.app.domain.handlers.bot;
 
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import ru.urfu.bot.app.JpaChatRepository;
-import ru.urfu.bot.app.JpaUserRepository;
-import ru.urfu.bot.domain.Chat;
-import ru.urfu.bot.domain.User;
+import ru.urfu.bot.app.db.repositories.JpaChatRepository;
+import ru.urfu.bot.app.db.repositories.JpaUserRepository;
+import ru.urfu.bot.app.domain.entities.Chat;
+import ru.urfu.bot.app.domain.entities.User;
+import ru.urfu.bot.app.domain.handlers.Command;
 
 @Component
-public class StartCommand implements Command {
+public class StartBotCommand implements Command {
 
     private final JpaUserRepository userRepository;
 
     private final JpaChatRepository chatRepository;
 
-    public StartCommand(
+    public StartBotCommand(
             JpaUserRepository userRepository,
             JpaChatRepository chatRepository) {
 

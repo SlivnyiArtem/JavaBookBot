@@ -1,4 +1,4 @@
-package ru.urfu.bot.domain;
+package ru.urfu.bot.app.domain.entities;
 
 import jakarta.persistence.*;
 

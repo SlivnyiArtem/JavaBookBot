@@ -1,4 +1,4 @@
-package ru.urfu.bot.app;
+package ru.urfu.bot.api;
 
 import reactor.core.publisher.Mono;
 

@@ -1,11 +1,9 @@
-package ru.urfu.bot.infrastructure;
+package ru.urfu.bot.api;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import ru.urfu.bot.app.BookApiClient;
-
-import java.util.List;
+import ru.urfu.bot.app.config.BotProperties;
 
 @Component
 public class GoogleBooksApiClient implements BookApiClient {

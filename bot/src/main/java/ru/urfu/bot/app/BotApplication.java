@@ -1,9 +1,9 @@
-package ru.urfu.bot;
+package ru.urfu.bot.app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import ru.urfu.bot.infrastructure.BotProperties;
+import ru.urfu.bot.app.config.BotProperties;
 
 @SpringBootApplication
 @EnableConfigurationProperties(BotProperties.class)
