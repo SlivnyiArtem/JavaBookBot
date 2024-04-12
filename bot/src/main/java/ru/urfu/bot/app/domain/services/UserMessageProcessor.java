@@ -7,6 +7,7 @@ import ru.urfu.bot.app.domain.handlers.Command;
 import ru.urfu.bot.app.domain.handlers.books.AddBookCommand;
 import ru.urfu.bot.app.domain.handlers.books.PrintBooksCommand;
 import ru.urfu.bot.app.domain.handlers.books.SearchBookCommand;
+import ru.urfu.bot.app.domain.handlers.bot.HelpBotCommand;
 import ru.urfu.bot.app.domain.handlers.bot.StartBotCommand;
 
 import java.util.Map;
@@ -17,14 +18,18 @@ public class UserMessageProcessor {
     private final Map<String, Command> commands;
 
     public UserMessageProcessor(
-            StartBotCommand startBotCommand, SearchBookCommand searchBookCommand,
-            AddBookCommand addBookCommand, PrintBooksCommand printBooksCommand) {
+            StartBotCommand startBotCommand,
+            SearchBookCommand searchBookCommand,
+            AddBookCommand addBookCommand,
+            PrintBooksCommand printBooksCommand,
+            HelpBotCommand helpCommand) {
 
         this.commands = Map.of(
                 "/start", startBotCommand,
                 "/search_book", searchBookCommand,
                 "/add_book", addBookCommand,
-                "/my_books", printBooksCommand
+                "/my_books", printBooksCommand,
+                "/help", helpCommand
         );
     }
 

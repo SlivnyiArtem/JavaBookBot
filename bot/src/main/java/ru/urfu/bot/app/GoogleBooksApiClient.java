@@ -1,4 +1,4 @@
-package ru.urfu.bot.api;
+package ru.urfu.bot.app;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
