@@ -3,6 +3,7 @@ package ru.urfu.bot.app;
 import org.springframework.stereotype.Service;
 import ru.urfu.bot.domain.entities.Chat;
 import ru.urfu.bot.domain.entities.User;
+import ru.urfu.bot.infrastructure.db.repositories.JpaBookRepository;
 import ru.urfu.bot.infrastructure.db.repositories.JpaChatRepository;
 import ru.urfu.bot.infrastructure.db.repositories.JpaUserRepository;
 
@@ -11,13 +12,16 @@ public class UserBookService {
 
     private final JpaUserRepository userRepository;
     private final JpaChatRepository chatRepository;
+    private final JpaBookRepository bookRepository;
 
     public UserBookService(
             JpaUserRepository userRepository,
-            JpaChatRepository chatRepository, JpaUserRepository userRepository1, JpaChatRepository chatRepository1) {
+            JpaChatRepository chatRepository,
+            JpaBookRepository bookRepository) {
 
-        this.userRepository = userRepository1;
-        this.chatRepository = chatRepository1;
+        this.bookRepository = bookRepository;
+        this.userRepository = userRepository;
+        this.chatRepository = chatRepository;
     }
 
     public void registerChat(String userName, Long chatId) {

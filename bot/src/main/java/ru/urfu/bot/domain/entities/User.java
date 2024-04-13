@@ -37,5 +37,6 @@ public class User {
     @OneToMany(mappedBy = "user")
     private final Set<Chat> chats = new HashSet<>();
 
-
+    @ManyToMany(mappedBy = "users")
+    private final Set<Book> books = new HashSet<>();
 }
