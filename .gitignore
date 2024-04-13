@@ -9,8 +9,6 @@ target/
 *.iml
 *.ipr
 
-bot/src/main/java/.env
-
 ### VS Code ###
 .vscode/
 
