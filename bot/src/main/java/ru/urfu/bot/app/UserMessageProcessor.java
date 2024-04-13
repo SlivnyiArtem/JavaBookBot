@@ -1,5 +1,6 @@
 package ru.urfu.bot.app;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -17,7 +18,7 @@ public class UserMessageProcessor {
 
     private final Map<String, Command> commands;
 
-    public UserMessageProcessor(Map<String, Command> commandMap) {
+    public UserMessageProcessor(@Qualifier(value = "commandMap") Map<String, Command> commandMap) {
         this.commands = commandMap;
     }
 

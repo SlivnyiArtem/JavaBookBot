@@ -9,8 +9,32 @@ import java.util.Set;
 @Entity
 public class Book {
 
+    public void setIsbn13(Long isbn13) {
+        this.isbn13 = isbn13;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setAuthors(String authors) {
+        this.authors = authors;
+    }
+
+    public void setPublisher(String publisher) {
+        this.publisher = publisher;
+    }
+
+    public void setPublishedDate(LocalDate publishedDate) {
+        this.publishedDate = publishedDate;
+    }
+
     @Id
-    private Long isbn10;
+    private Long isbn13;
 
     private String title;
 

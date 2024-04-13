@@ -7,8 +7,6 @@ import ru.urfu.bot.app.UserBookService;
 import ru.urfu.bot.domain.entities.Book;
 import ru.urfu.bot.domain.handlers.Command;
 
-import java.util.List;
-
 @Component
 public class AddBookCommand implements Command {
 

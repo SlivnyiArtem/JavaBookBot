@@ -25,6 +25,7 @@
     <junit.version>3.8.1</junit.version>
     <archunit-junit5.version>1.2.1</archunit-junit5.version>
     <jaxb-api.version>2.3.0</jaxb-api.version>
+    <modelmapper.version>3.2.0</modelmapper.version>
   </properties>
 
   <dependencyManagement>
@@ -59,6 +60,12 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-webflux</artifactId>
         <version>${spring-boot.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.modelmapper</groupId>
+        <artifactId>modelmapper</artifactId>
+        <version>${modelmapper.version}</version>
       </dependency>
 
       <!-- Database -->

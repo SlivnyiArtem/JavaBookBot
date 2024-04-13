@@ -1,14 +1,9 @@
 package ru.urfu.bot.domain.handlers.bot;
 
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.urfu.bot.app.UserBookService;
-import ru.urfu.bot.infrastructure.db.repositories.JpaChatRepository;
-import ru.urfu.bot.infrastructure.db.repositories.JpaUserRepository;
-import ru.urfu.bot.domain.entities.Chat;
-import ru.urfu.bot.domain.entities.User;
 import ru.urfu.bot.domain.handlers.Command;
 
 @Service

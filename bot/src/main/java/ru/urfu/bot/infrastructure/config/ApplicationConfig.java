@@ -1,5 +1,6 @@
 package ru.urfu.bot.infrastructure.config;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -32,5 +33,10 @@ public class ApplicationConfig {
                 "/my_books", new PrintBooksCommand(userBookService),
                 "/help", new HelpBotCommand(userBookService)
         );
+    }
+
+    @Bean
+    public ModelMapper modelMapper() {
+        return new ModelMapper();
     }
 }

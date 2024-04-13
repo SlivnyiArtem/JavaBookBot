@@ -1,6 +1,5 @@
-package ru.urfu.bot.domain;
+package ru.urfu.bot.app;
 
-import reactor.core.publisher.Mono;
 import ru.urfu.bot.domain.entities.Book;
 
 import java.util.List;

@@ -1,7 +1,6 @@
 package ru.urfu.bot.app;
 
 import org.springframework.stereotype.Service;
-import ru.urfu.bot.domain.BookApiClient;
 import ru.urfu.bot.domain.entities.Book;
 import ru.urfu.bot.domain.entities.Chat;
 import ru.urfu.bot.domain.entities.User;
@@ -10,7 +9,6 @@ import ru.urfu.bot.infrastructure.db.repositories.JpaChatRepository;
 import ru.urfu.bot.infrastructure.db.repositories.JpaUserRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserBookService {
@@ -47,7 +45,9 @@ public class UserBookService {
     }
 
     public List<Book> getBooksByTitle(String title) {
-        return bookApiClient.findBooksByName(title);
+        List<Book> books = bookApiClient.findBooksByName(title);
+        System.out.println(books.subList(0, 10));
+        return books;
     }
 
     public Book addBookByIsbn(String username, Long isbn) {
