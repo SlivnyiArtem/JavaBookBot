@@ -1,9 +1,6 @@
 package ru.urfu.bot.domain.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
+import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -25,10 +22,15 @@ public class Book {
 
     private LocalDate publishedDate;
 
+    @ManyToMany
     @JoinTable(
             name = "tracking",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "book_id")
+            joinColumns = @JoinColumn(name = "book_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private final Set<User> users = new HashSet<>();
+
+    public Set<User> getUsers() {
+        return users;
+    }
 }

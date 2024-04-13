@@ -27,10 +27,10 @@ public class ApplicationConfig {
     Map<String, Command> commandMap(UserBookService userBookService) {
         return Map.of(
                 "/start", new StartBotCommand(userBookService),
-                "/search_book", new SearchBookCommand(),
-                "/add_book", new AddBookCommand(),
-                "/my_books", new PrintBooksCommand(),
-                "/help", new HelpBotCommand()
+                "/search_book", new SearchBookCommand(userBookService),
+                "/add_book", new AddBookCommand(userBookService),
+                "/my_books", new PrintBooksCommand(userBookService),
+                "/help", new HelpBotCommand(userBookService)
         );
     }
 }

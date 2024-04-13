@@ -27,6 +27,10 @@ public class User {
         return userName;
     }
 
+    public Set<Book> getBooks() {
+        return books;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;

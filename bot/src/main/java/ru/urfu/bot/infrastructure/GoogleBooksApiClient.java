@@ -4,7 +4,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import ru.urfu.bot.domain.BookApiClient;
+import ru.urfu.bot.domain.entities.Book;
 import ru.urfu.bot.infrastructure.config.BotProperties;
+
+import java.util.List;
 
 @Component
 public class GoogleBooksApiClient implements BookApiClient {
@@ -19,10 +22,16 @@ public class GoogleBooksApiClient implements BookApiClient {
     }
 
     @Override
-    public Mono<?> findBooksByName(String name) {
-        return webClient.get()
+    public List<Book> findBooksByName(String name) {
+        webClient.get()
                 .uri("/volumes?q={name}", name)
                 .retrieve()
                 .bodyToMono(Object.class).log();
+        return List.of();
+    }
+
+    @Override
+    public Book findBookByIsbn(Long isbn) {
+        return null;
     }
 }
