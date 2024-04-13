@@ -8,6 +8,7 @@ import ru.urfu.bot.domain.entities.Book;
 import ru.urfu.bot.domain.handlers.Command;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class PrintBooksCommand implements Command {
@@ -25,7 +26,12 @@ public class PrintBooksCommand implements Command {
         Long chatId = update.getMessage().getChatId();
 
         List<Book> books = userBookService.getUserBooks(userName);
+        String message = "Книги в избранном:\n%s".formatted(books.stream()
+                .map(book -> "isbn: %d\nНазвание: %s\nОписание: %s\nАвторы: %s\nИздатель: %s\nДата издания: %s\n\n".formatted(
+                        book.getIsbn13(), book.getTitle(), book.getDescription(),
+                        book.getAuthors(), book.getPublisher(), book.getPublishedDate()
+                )).collect(Collectors.joining()));
 
-        return new SendMessage(chatId.toString(), "not implemented");
+        return new SendMessage(chatId.toString(), message);
     }
 }

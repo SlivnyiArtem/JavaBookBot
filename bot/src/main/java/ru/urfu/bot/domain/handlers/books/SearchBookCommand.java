@@ -8,6 +8,7 @@ import ru.urfu.bot.domain.entities.Book;
 import ru.urfu.bot.domain.handlers.Command;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class SearchBookCommand implements Command {
@@ -25,7 +26,12 @@ public class SearchBookCommand implements Command {
         String query = update.getMessage().getText().split(" ")[1];
 
         List<Book> bookList = userBookService.getBooksByTitle(query);
+        String message = "Результаты поиска:\n%s".formatted(bookList.stream()
+                .map(book -> "isbn: %d\nНазвание: %s\nАвторы: %s\nИздатель: %s\nДата издания: %s\n\n".formatted(
+                        book.getIsbn13(), book.getTitle(),
+                        book.getAuthors(), book.getPublisher(), book.getPublishedDate()
+                )).collect(Collectors.joining()));
 
-        return new SendMessage(chatId.toString(), "not implemented");
+        return new SendMessage(chatId.toString(), message);
     }
 }

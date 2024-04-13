@@ -24,8 +24,8 @@ public class AddBookCommand implements Command {
 
         String query = update.getMessage().getText().split(" ")[1];
 
-        Book bookList = userBookService.addBookByIsbn(userName, Long.parseLong(query));
+        userBookService.addBookByIsbn(userName, Long.parseLong(query));
 
-        return new SendMessage(chatId.toString(), "not implemented");
+        return new SendMessage(chatId.toString(), "Книга добавленна в избранное");
     }
 }

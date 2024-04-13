@@ -1,6 +1,8 @@
 package ru.urfu.bot.app;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.urfu.bot.domain.entities.Book;
 import ru.urfu.bot.domain.entities.Chat;
 import ru.urfu.bot.domain.entities.User;
@@ -31,6 +33,7 @@ public class UserBookService {
         this.bookApiClient = bookApiClient;
     }
 
+    @Transactional(propagation=Propagation.REQUIRED, noRollbackFor=Exception.class)
     public void registerChat(String userName, Long chatId) {
         if (chatRepository.findById(chatId).isEmpty()) {
             User user = userRepository.findByUserName(userName).orElse(new User(userName));
@@ -45,11 +48,10 @@ public class UserBookService {
     }
 
     public List<Book> getBooksByTitle(String title) {
-        List<Book> books = bookApiClient.findBooksByName(title);
-        System.out.println(books.subList(0, 10));
-        return books;
+        return bookApiClient.findBooksByName(title);
     }
 
+    @Transactional(propagation= Propagation.REQUIRED, noRollbackFor=Exception.class)
     public Book addBookByIsbn(String username, Long isbn) {
         Book book = bookApiClient.findBookByIsbn(isbn);
 
@@ -57,11 +59,12 @@ public class UserBookService {
         book.getUsers().add(user);
         user.getBooks().add(book);
 
-        userRepository.save(user);
         bookRepository.save(book);
+        userRepository.save(user);
         return book;
     }
 
+    @Transactional(propagation=Propagation.REQUIRED, noRollbackFor=Exception.class)
     public List<Book> getUserBooks(String username) {
         return userRepository.findByUserName(username)
                 .orElseThrow().getBooks().stream().toList();

@@ -18,6 +18,15 @@ public class Book {
     }
 
     public void setDescription(String description) {
+        try {
+            int size = 255;
+            int inLength = description.length();
+            if (inLength>size)
+            {
+                description = description.substring(0, size);
+            }
+        } catch (SecurityException ex) {
+        }
         this.description = description;
     }
 
@@ -31,6 +40,30 @@ public class Book {
 
     public void setPublishedDate(LocalDate publishedDate) {
         this.publishedDate = publishedDate;
+    }
+
+    public Long getIsbn13() {
+        return isbn13;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getAuthors() {
+        return authors;
+    }
+
+    public String getPublisher() {
+        return publisher;
+    }
+
+    public LocalDate getPublishedDate() {
+        return publishedDate;
     }
 
     @Id

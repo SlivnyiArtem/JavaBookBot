@@ -35,6 +35,7 @@ public class GoogleBooksApiClient implements BookApiClient {
                 .getItems()
                 .stream()
                 .map(bookApiDto -> modelMapper.map(bookApiDto, Book.class))
+                .limit(10)
                 .toList();
     }
 
