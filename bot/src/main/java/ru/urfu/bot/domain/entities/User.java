@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Объект пользователя телеграм-бота
+ */
 @Entity
 @Table(name = "users")
 public class User {

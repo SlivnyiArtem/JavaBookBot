@@ -6,8 +6,8 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import ru.urfu.bot.infrastructure.config.BotProperties;
 import ru.urfu.bot.app.UserMessageProcessor;
+import ru.urfu.bot.infrastructure.config.BotProperties;
 
 
 /**
@@ -21,6 +21,9 @@ public class Bot extends TelegramLongPollingBot {
     private final UserMessageProcessor userMessageProcessor;
 
 
+    /**
+     * Конфигурирует и запускает бота
+     */
     public Bot(
             TelegramBotsApi telegramBotsApi,
             BotProperties properties,
@@ -32,6 +35,9 @@ public class Bot extends TelegramLongPollingBot {
         telegramBotsApi.registerBot(this);
     }
 
+    /**
+     * Метод предназначен для обработки сообщений от пользователя
+     */
     @Override
     public void onUpdateReceived(Update update) {
         SendMessage message = userMessageProcessor.process(update);

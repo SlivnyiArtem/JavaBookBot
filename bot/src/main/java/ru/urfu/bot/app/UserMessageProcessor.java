@@ -5,14 +5,12 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.urfu.bot.domain.handlers.Command;
-import ru.urfu.bot.domain.handlers.books.AddBookCommand;
-import ru.urfu.bot.domain.handlers.books.PrintBooksCommand;
-import ru.urfu.bot.domain.handlers.books.SearchBookCommand;
-import ru.urfu.bot.domain.handlers.bot.HelpBotCommand;
-import ru.urfu.bot.domain.handlers.bot.StartBotCommand;
 
 import java.util.Map;
 
+/**
+ * Сервис для определения и выполнения команд
+ */
 @Service
 public class UserMessageProcessor {
 

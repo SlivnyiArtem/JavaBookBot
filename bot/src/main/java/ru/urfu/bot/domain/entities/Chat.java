@@ -5,6 +5,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
+/**
+ * Телеграм чат, сохраненный в бд
+ */
 @Entity
 public class Chat {
 

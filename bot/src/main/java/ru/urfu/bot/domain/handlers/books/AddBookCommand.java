@@ -3,10 +3,13 @@ package ru.urfu.bot.domain.handlers.books;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import ru.urfu.bot.domain.port.UserBookService;
 import ru.urfu.bot.domain.entities.Book;
 import ru.urfu.bot.domain.handlers.Command;
+import ru.urfu.bot.domain.port.UserBookService;
 
+/**
+ * Сохраняет книгу по isbn коду в бд для конретного пользователя
+ */
 @Component
 public class AddBookCommand implements Command {
 

@@ -1,13 +1,14 @@
 package ru.urfu.bot.infrastructure.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Dto для получения информации о книге из api
+ */
 public class BookApiDto {
 
     public String getTitle() {

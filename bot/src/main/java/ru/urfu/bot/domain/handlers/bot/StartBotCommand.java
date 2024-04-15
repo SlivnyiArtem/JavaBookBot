@@ -3,9 +3,12 @@ package ru.urfu.bot.domain.handlers.bot;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import ru.urfu.bot.domain.port.UserBookService;
 import ru.urfu.bot.domain.handlers.Command;
+import ru.urfu.bot.domain.port.UserBookService;
 
+/**
+ * Запускает бота и записывает пользователя и чат в бд
+ */
 @Service
 public class StartBotCommand implements Command {
 

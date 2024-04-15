@@ -11,6 +11,9 @@ import ru.urfu.bot.infrastructure.dto.BookListApiDto;
 
 import java.util.List;
 
+/**
+ * Клиент, предназначенный для взаимодействия с Google Books API
+ */
 @Component
 public class GoogleBooksApiClient implements BookApiClient {
 
@@ -25,6 +28,9 @@ public class GoogleBooksApiClient implements BookApiClient {
         this.modelMapper = modelMapper;
     }
 
+    /**
+     * Возвращает список книг, найденных через api. Ищет по названию книги
+     */
     @Override
     public List<Book> findBooksByName(String name) {
         return webClient.get()
@@ -39,6 +45,9 @@ public class GoogleBooksApiClient implements BookApiClient {
                 .toList();
     }
 
+    /**
+     * Находит и возвращает книгу, по isbn коду
+     */
     @Override
     public Book findBookByIsbn(Long isbn) {
         BookApiDto bookApiDto = webClient.get()

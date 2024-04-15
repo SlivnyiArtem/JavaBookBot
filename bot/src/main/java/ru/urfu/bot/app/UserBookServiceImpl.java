@@ -7,13 +7,16 @@ import ru.urfu.bot.app.port.BookApiClient;
 import ru.urfu.bot.app.port.BookRepository;
 import ru.urfu.bot.app.port.ChatRepository;
 import ru.urfu.bot.app.port.UserRepository;
-import ru.urfu.bot.domain.port.UserBookService;
 import ru.urfu.bot.domain.entities.Book;
 import ru.urfu.bot.domain.entities.Chat;
 import ru.urfu.bot.domain.entities.User;
+import ru.urfu.bot.domain.port.UserBookService;
 
 import java.util.List;
 
+/**
+ * Сервис для взаимодействия с dao и api клиентом
+ */
 @Service
 public class UserBookServiceImpl implements UserBookService {
 
@@ -34,6 +37,9 @@ public class UserBookServiceImpl implements UserBookService {
         this.bookApiClient = bookApiClient;
     }
 
+    /**
+     * Сохраняет чат и пользователя в бд
+     */
     @Transactional(propagation=Propagation.REQUIRED, noRollbackFor=Exception.class)
     public void addChat(String userName, Long chatId) {
         if (chatRepository.findById(chatId).isEmpty()) {
@@ -48,14 +54,23 @@ public class UserBookServiceImpl implements UserBookService {
         }
     }
 
+    /**
+     * Возвращает список книг по названию (из api)
+     */
     public List<Book> findBooksByTitle(String title) {
         return bookApiClient.findBooksByName(title);
     }
 
+    /**
+     * Возращает книгу по isbn коду (из api)
+     */
     public Book findBookByIsbn(Long isbn) {
         return bookApiClient.findBookByIsbn(isbn);
     }
 
+    /**
+     * Сохраняет книгу в бд для пользователя
+     */
     @Transactional(propagation= Propagation.REQUIRED, noRollbackFor=Exception.class)
     public void addBook(String username, Book book) {
         User user = userRepository.findByUserName(username).orElseThrow();
@@ -66,15 +81,22 @@ public class UserBookServiceImpl implements UserBookService {
         userRepository.save(user);
     }
 
+    /**
+     * Удаляет книгу из бд для пользователя
+     */
     @Transactional(propagation= Propagation.REQUIRED, noRollbackFor=Exception.class)
     public void removeBook(String username, Book book) {
         User user = userRepository.findByUserName(username).orElseThrow();
+        book.getUsers().remove(user);
         user.getBooks().remove(book);
 
         bookRepository.delete(book);
         userRepository.save(user);
     }
 
+    /**
+     * Возвращает список книг пользователя
+     */
     @Transactional(propagation=Propagation.REQUIRED, noRollbackFor=Exception.class)
     public List<Book> getUserBooks(String username) {
         return userRepository.findByUserName(username)

@@ -3,13 +3,16 @@ package ru.urfu.bot.domain.handlers.books;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import ru.urfu.bot.domain.port.UserBookService;
 import ru.urfu.bot.domain.entities.Book;
 import ru.urfu.bot.domain.handlers.Command;
+import ru.urfu.bot.domain.port.UserBookService;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Выводит список книг пользователя
+ */
 @Component
 public class PrintBooksCommand implements Command {
 

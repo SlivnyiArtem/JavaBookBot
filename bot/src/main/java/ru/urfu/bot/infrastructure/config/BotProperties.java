@@ -6,6 +6,13 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotEmpty;
 
+/**
+ * Устанавливает переменные для приложения
+ * @param telegramToken - токен телеграм бота
+ * @param telegramBotName - имя бота
+ * @param apiKey - ключ для аутентификации в Google Books API (пока не используется)
+ * @param bookApiBaseUrl - url для общения с api
+ */
 @Validated
 @ConfigurationProperties(prefix = "app", ignoreUnknownFields = false)
 @PropertySource("classpath:application.yml")
