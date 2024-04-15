@@ -10,6 +10,7 @@ import ru.urfu.bot.infrastructure.dto.BookApiDto;
 import ru.urfu.bot.infrastructure.dto.BookListApiDto;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Клиент, предназначенный для взаимодействия с Google Books API
@@ -33,11 +34,16 @@ public class GoogleBooksApiClient implements BookApiClient {
      */
     @Override
     public List<Book> findBooksByName(String name) {
-        return webClient.get()
+        BookListApiDto bookListApiDto= webClient.get()
                 .uri("/volumes?q={name}", name)
                 .retrieve()
                 .bodyToMono(BookListApiDto.class)
-                .block()
+                .block();
+
+        if (bookListApiDto.getTotalItems() == 0) {
+            return List.of();
+        }
+        return bookListApiDto
                 .getItems()
                 .stream()
                 .filter(bookApiDto -> bookApiDto.getIsbn13() != null)
@@ -51,12 +57,16 @@ public class GoogleBooksApiClient implements BookApiClient {
      */
     @Override
     public Book findBookByIsbn(Long isbn) {
-        BookApiDto bookApiDto = webClient.get()
+        BookListApiDto bookListApiDto = webClient.get()
                 .uri("/volumes?q=isbn:{isbn}", isbn)
                 .retrieve()
                 .bodyToMono(BookListApiDto.class)
-                .block()
-                .getItems()
+                .block();
+
+        if (bookListApiDto.getTotalItems() == 0) {
+            throw new NoSuchElementException();
+        }
+        BookApiDto bookApiDto = bookListApiDto.getItems()
                 .stream()
                 .filter(bookApiDto1 -> bookApiDto1.getIsbn13() != null)
                 .findFirst()

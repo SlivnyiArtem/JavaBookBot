@@ -7,6 +7,8 @@ import java.util.List;
  */
 public class BookListApiDto {
 
+    private Long totalItems;
+
     private List<BookApiDto> items;
 
     public List<BookApiDto> getItems() {
@@ -15,5 +17,13 @@ public class BookListApiDto {
 
     public void setItems(List<BookApiDto> items) {
         this.items = items;
+    }
+
+    public Long getTotalItems() {
+        return totalItems;
+    }
+
+    public void setTotalItems(Long totalItems) {
+        this.totalItems = totalItems;
     }
 }

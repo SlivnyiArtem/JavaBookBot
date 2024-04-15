@@ -26,7 +26,7 @@ public class SearchBookCommand implements Command {
     public SendMessage handle(Update update) {
         Long chatId = update.getMessage().getChatId();
 
-        String query = update.getMessage().getText().substring(update.getMessage().getText().indexOf(" "));
+        String query = update.getMessage().getText().substring(update.getMessage().getText().indexOf(" ") + 1);
 
         List<Book> bookList = userBookService.findBooksByTitle(query);
         String message = "Результаты поиска:\n%s".formatted(bookList.stream()
