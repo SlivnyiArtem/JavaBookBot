@@ -55,6 +55,14 @@ public class UserBookServiceImpl implements UserBookService {
     }
 
     /**
+     * Возвращает true, если чат сохранен в бд
+     */
+    @Transactional(propagation=Propagation.REQUIRED, noRollbackFor=Exception.class)
+    public boolean containsChat(Long id) {
+        return chatRepository.findById(id).isPresent();
+    }
+
+    /**
      * Возвращает список книг по названию (из api)
      */
     public List<Book> findBooksByTitle(String title) {

@@ -12,4 +12,9 @@ public interface Command {
      * Метод обрабатывает сообщение пользователя и возварщает ответ
      */
     SendMessage handle(Update update);
+
+    /**
+     * Возвращает true, если команда поддерживается в данный момент
+     */
+    boolean supports(Update update);
 }

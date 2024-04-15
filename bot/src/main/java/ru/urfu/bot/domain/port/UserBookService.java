@@ -8,7 +8,10 @@ public interface UserBookService {
 
     void addChat(String username, Long chatId);
 
+    boolean containsChat(Long id);
+
     List<Book> findBooksByTitle(String title);
+
 
     Book findBookByIsbn(Long isbn);
 

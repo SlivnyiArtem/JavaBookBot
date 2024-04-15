@@ -27,4 +27,9 @@ public class StartBotCommand implements Command {
 
         return new SendMessage(chatId.toString(), "Bot started");
     }
+
+    @Override
+    public boolean supports(Update update) {
+        return true;
+    }
 }

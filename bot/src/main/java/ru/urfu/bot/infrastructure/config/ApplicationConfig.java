@@ -7,10 +7,7 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import ru.urfu.bot.domain.handlers.Command;
-import ru.urfu.bot.domain.handlers.books.AddBookCommand;
-import ru.urfu.bot.domain.handlers.books.PrintBooksCommand;
-import ru.urfu.bot.domain.handlers.books.RemoveBookCommand;
-import ru.urfu.bot.domain.handlers.books.SearchBookCommand;
+import ru.urfu.bot.domain.handlers.books.*;
 import ru.urfu.bot.domain.handlers.bot.HelpBotCommand;
 import ru.urfu.bot.domain.handlers.bot.StartBotCommand;
 import ru.urfu.bot.domain.port.UserBookService;
@@ -39,7 +36,8 @@ public class ApplicationConfig {
                 "/add_book", new AddBookCommand(userBookService),
                 "/remove_book", new RemoveBookCommand(userBookService),
                 "/my_books", new PrintBooksCommand(userBookService),
-                "/help", new HelpBotCommand(userBookService)
+                "/help", new HelpBotCommand(userBookService),
+                "/book_inf", new BookInfoCommand(userBookService)
         );
     }
 

@@ -26,6 +26,9 @@ public class UserMessageProcessor {
 
         Command handler = this.commands.get(command);
 
+        if (!handler.supports(update)) {
+            return new SendMessage(update.getMessage().getChatId().toString(), "Команда не доступна");
+        }
         return handler.handle(update);
     }
 }

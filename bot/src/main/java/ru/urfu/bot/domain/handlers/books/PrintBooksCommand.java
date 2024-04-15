@@ -30,11 +30,15 @@ public class PrintBooksCommand implements Command {
 
         List<Book> books = userBookService.getUserBooks(userName);
         String message = "Книги в избранном:\n%s".formatted(books.stream()
-                .map(book -> "isbn: %d\nНазвание: %s\nОписание: %s\nАвторы: %s\nИздатель: %s\nДата издания: %s\n\n".formatted(
-                        book.getIsbn13(), book.getTitle(), book.getDescription(),
-                        book.getAuthors(), book.getPublisher(), book.getPublishedDate()
+                .map(book -> "isbn: %d\nНазвание: %s\n\n".formatted(
+                        book.getIsbn13(), book.getTitle()
                 )).collect(Collectors.joining()));
 
         return new SendMessage(chatId.toString(), message);
+    }
+
+    @Override
+    public boolean supports(Update update) {
+        return userBookService.containsChat(update.getMessage().getChatId());
     }
 }

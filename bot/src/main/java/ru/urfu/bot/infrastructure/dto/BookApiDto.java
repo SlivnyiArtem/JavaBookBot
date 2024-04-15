@@ -3,8 +3,10 @@ package ru.urfu.bot.infrastructure.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  * Dto для получения информации о книге из api
@@ -65,7 +67,7 @@ public class BookApiDto {
 
     private String description;
 
-    private String authors;
+    private String authors = "";
 
     private String publisher;
 
@@ -82,13 +84,21 @@ public class BookApiDto {
         }
 
         this.publisher = volumeInfo.get("publisher") != null ? (String) volumeInfo.get("publisher") : "";
-        this.publishedDate = LocalDate.parse((String) volumeInfo.get("publishedDate"));
+
+        try {
+            this.publishedDate = LocalDate.parse((String) volumeInfo.get("publishedDate"));
+        } catch (DateTimeParseException e) {
+        }
 
         List<Map<String, String>> identifiers = (List<Map<String, String>>) volumeInfo.get("industryIdentifiers");
-        this.isbn13 = Long.parseLong(identifiers.stream()
-                .filter(map -> map.get("type").equals("ISBN_13"))
-                .findFirst()
-                .orElseThrow()
-                .get("identifier"));
+
+        try {
+            this.isbn13 = Long.parseLong(identifiers.stream()
+                    .filter(map -> map.get("type").equals("ISBN_13"))
+                    .findFirst()
+                    .orElseThrow()
+                    .get("identifier"));
+        } catch (NoSuchElementException e) {
+        }
     }
 }

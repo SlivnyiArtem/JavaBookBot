@@ -40,6 +40,7 @@ public class GoogleBooksApiClient implements BookApiClient {
                 .block()
                 .getItems()
                 .stream()
+                .filter(bookApiDto -> bookApiDto.getIsbn13() != null)
                 .map(bookApiDto -> modelMapper.map(bookApiDto, Book.class))
                 .limit(10)
                 .toList();
@@ -56,7 +57,10 @@ public class GoogleBooksApiClient implements BookApiClient {
                 .bodyToMono(BookListApiDto.class)
                 .block()
                 .getItems()
-                .getFirst();
+                .stream()
+                .filter(bookApiDto1 -> bookApiDto1.getIsbn13() != null)
+                .findFirst()
+                .orElseThrow();
         return modelMapper.map(bookApiDto, Book.class);
     }
 }

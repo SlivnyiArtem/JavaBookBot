@@ -7,17 +7,15 @@ import ru.urfu.bot.domain.entities.Book;
 import ru.urfu.bot.domain.handlers.Command;
 import ru.urfu.bot.domain.port.UserBookService;
 
-import java.util.NoSuchElementException;
-
 /**
- * Удаляет книгу по isbn коду из бд для конретного пользователя
+ * Выводит информацию о книге по isbn (в бд)
  */
 @Component
-public class RemoveBookCommand implements Command {
+public class BookInfoCommand implements Command {
 
     private final UserBookService userBookService;
 
-    public RemoveBookCommand(UserBookService userBookService) {
+    public BookInfoCommand(UserBookService userBookService) {
         this.userBookService = userBookService;
     }
 
@@ -27,14 +25,18 @@ public class RemoveBookCommand implements Command {
         Long chatId = update.getMessage().getChatId();
 
         String query = update.getMessage().getText().split(" ")[1];
+        Book book = userBookService.getUserBooks(userName).stream()
+                .filter(book1 -> book1.getIsbn13().equals(Long.parseLong(query)))
+                .findFirst()
+                .orElseThrow();
 
-        try {
-            Book book = userBookService.findBookByIsbn(Long.parseLong(query));
-            userBookService.removeBook(userName, book);
-            return new SendMessage(chatId.toString(), "Книга удаленна из избранных");
-        } catch (NoSuchElementException e) {
-            return new SendMessage(chatId.toString(), "Книга не найдена");
-        }
+        String message = "isbn: %d\nНазвание: %s\nОписание: %s\nАвторы: %s\nИздатель: %s\nДата издания: %s\n\n"
+                .formatted(
+                        book.getIsbn13(), book.getTitle(), book.getDescription(),
+                        book.getAuthors(), book.getPublisher(), book.getPublishedDate()
+        );
+
+        return new SendMessage(chatId.toString(), message);
     }
 
     @Override

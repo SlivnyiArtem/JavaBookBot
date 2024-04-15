@@ -7,6 +7,8 @@ import ru.urfu.bot.domain.entities.Book;
 import ru.urfu.bot.domain.handlers.Command;
 import ru.urfu.bot.domain.port.UserBookService;
 
+import java.util.NoSuchElementException;
+
 /**
  * Сохраняет книгу по isbn коду в бд для конретного пользователя
  */
@@ -27,9 +29,17 @@ public class AddBookCommand implements Command {
 
         String query = update.getMessage().getText().split(" ")[1];
 
-        Book book = userBookService.findBookByIsbn(Long.parseLong(query));
-        userBookService.addBook(userName, book);
+        try {
+            Book book = userBookService.findBookByIsbn(Long.parseLong(query));
+            userBookService.addBook(userName, book);
+            return new SendMessage(chatId.toString(), "Книга добавленна в избранное");
+        } catch (NoSuchElementException e) {
+            return new SendMessage(chatId.toString(), "Книга не найдена");
+        }
+    }
 
-        return new SendMessage(chatId.toString(), "Книга добавленна в избранное");
+    @Override
+    public boolean supports(Update update) {
+        return userBookService.containsChat(update.getMessage().getChatId());
     }
 }

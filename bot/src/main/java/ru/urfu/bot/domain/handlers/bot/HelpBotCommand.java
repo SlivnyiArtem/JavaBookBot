@@ -29,8 +29,14 @@ public class HelpBotCommand implements Command {
                 /my_books
                 /add_book {isbn}
                 /remove_book {isbn}
-                /help""";
+                /help
+                /book_inf {isbn}""";
 
         return new SendMessage(chatId.toString(), message);
+    }
+
+    @Override
+    public boolean supports(Update update) {
+        return true;
     }
 }

@@ -37,4 +37,9 @@ public class SearchBookCommand implements Command {
 
         return new SendMessage(chatId.toString(), message);
     }
+
+    @Override
+    public boolean supports(Update update) {
+        return userBookService.containsChat(update.getMessage().getChatId());
+    }
 }
