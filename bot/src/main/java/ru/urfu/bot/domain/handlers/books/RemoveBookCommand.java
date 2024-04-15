@@ -3,12 +3,9 @@ package ru.urfu.bot.domain.handlers.books;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import ru.urfu.bot.app.UserBookService;
+import ru.urfu.bot.domain.port.UserBookService;
 import ru.urfu.bot.domain.entities.Book;
 import ru.urfu.bot.domain.handlers.Command;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class RemoveBookCommand implements Command {
@@ -26,7 +23,8 @@ public class RemoveBookCommand implements Command {
 
         String query = update.getMessage().getText().split(" ")[1];
 
-        userBookService.removeBookByIsbn(userName, Long.parseLong(query));
+        Book book = userBookService.findBookByIsbn(Long.parseLong(query));
+        userBookService.removeBook(userName, book);
 
         return new SendMessage(chatId.toString(), "Книга удаленна из избранных");
     }

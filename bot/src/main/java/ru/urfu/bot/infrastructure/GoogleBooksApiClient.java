@@ -3,7 +3,7 @@ package ru.urfu.bot.infrastructure;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import ru.urfu.bot.app.BookApiClient;
+import ru.urfu.bot.app.port.BookApiClient;
 import ru.urfu.bot.domain.entities.Book;
 import ru.urfu.bot.infrastructure.config.BotProperties;
 import ru.urfu.bot.infrastructure.dto.BookApiDto;

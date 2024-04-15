@@ -3,11 +3,10 @@ package ru.urfu.bot.domain.handlers.books;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import ru.urfu.bot.app.UserBookService;
+import ru.urfu.bot.domain.port.UserBookService;
 import ru.urfu.bot.domain.entities.Book;
 import ru.urfu.bot.domain.handlers.Command;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,7 +25,7 @@ public class SearchBookCommand implements Command {
 
         String query = update.getMessage().getText().substring(update.getMessage().getText().indexOf(" "));
 
-        List<Book> bookList = userBookService.getBooksByTitle(query);
+        List<Book> bookList = userBookService.findBooksByTitle(query);
         String message = "Результаты поиска:\n%s".formatted(bookList.stream()
                 .map(book -> "isbn: %d\nНазвание: %s\nАвторы: %s\nИздатель: %s\nДата издания: %s\n\n".formatted(
                         book.getIsbn13(), book.getTitle(),

@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
-import ru.urfu.bot.app.UserBookService;
+import ru.urfu.bot.domain.port.UserBookService;
 import ru.urfu.bot.domain.handlers.Command;
 import ru.urfu.bot.domain.handlers.books.AddBookCommand;
 import ru.urfu.bot.domain.handlers.books.PrintBooksCommand;

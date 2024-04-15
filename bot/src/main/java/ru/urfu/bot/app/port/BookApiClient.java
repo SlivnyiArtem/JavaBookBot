@@ -1,4 +1,4 @@
-package ru.urfu.bot.app;
+package ru.urfu.bot.app.port;
 
 import ru.urfu.bot.domain.entities.Book;
 
