@@ -1,17 +1,21 @@
-package ru.urfu.bot.domain.handlers.bot;
+package ru.urfu.bot.domain.handlers.books;
 
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.urfu.bot.app.UserBookService;
+import ru.urfu.bot.domain.entities.Book;
 import ru.urfu.bot.domain.handlers.Command;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
-public class HelpBotCommand implements Command {
+public class RemoveBookCommand implements Command {
 
     private final UserBookService userBookService;
 
-    public HelpBotCommand(UserBookService userBookService) {
+    public RemoveBookCommand(UserBookService userBookService) {
         this.userBookService = userBookService;
     }
 
@@ -20,14 +24,10 @@ public class HelpBotCommand implements Command {
         String userName = update.getMessage().getChat().getUserName();
         Long chatId = update.getMessage().getChatId();
 
-        String message = """
-                /start
-                /search_book {title}
-                /my_books
-                /add_book {isbn}
-                /remove_book {isbn}
-                /help""";
+        String query = update.getMessage().getText().split(" ")[1];
 
-        return new SendMessage(chatId.toString(), message);
+        userBookService.removeBookByIsbn(userName, Long.parseLong(query));
+
+        return new SendMessage(chatId.toString(), "Книга удаленна из избранных");
     }
 }

@@ -64,6 +64,18 @@ public class UserBookService {
         return book;
     }
 
+    @Transactional(propagation= Propagation.REQUIRED, noRollbackFor=Exception.class)
+    public Book removeBookByIsbn(String username, Long isbn) {
+        Book book = bookApiClient.findBookByIsbn(isbn);
+
+        User user = userRepository.findByUserName(username).orElseThrow();
+        user.getBooks().remove(book);
+
+        bookRepository.delete(book);
+        userRepository.save(user);
+        return book;
+    }
+
     @Transactional(propagation=Propagation.REQUIRED, noRollbackFor=Exception.class)
     public List<Book> getUserBooks(String username) {
         return userRepository.findByUserName(username)

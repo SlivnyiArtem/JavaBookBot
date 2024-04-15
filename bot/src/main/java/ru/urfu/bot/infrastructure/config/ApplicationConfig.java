@@ -10,6 +10,7 @@ import ru.urfu.bot.app.UserBookService;
 import ru.urfu.bot.domain.handlers.Command;
 import ru.urfu.bot.domain.handlers.books.AddBookCommand;
 import ru.urfu.bot.domain.handlers.books.PrintBooksCommand;
+import ru.urfu.bot.domain.handlers.books.RemoveBookCommand;
 import ru.urfu.bot.domain.handlers.books.SearchBookCommand;
 import ru.urfu.bot.domain.handlers.bot.HelpBotCommand;
 import ru.urfu.bot.domain.handlers.bot.StartBotCommand;
@@ -30,6 +31,7 @@ public class ApplicationConfig {
                 "/start", new StartBotCommand(userBookService),
                 "/search_book", new SearchBookCommand(userBookService),
                 "/add_book", new AddBookCommand(userBookService),
+                "/remove_book", new RemoveBookCommand(userBookService),
                 "/my_books", new PrintBooksCommand(userBookService),
                 "/help", new HelpBotCommand(userBookService)
         );

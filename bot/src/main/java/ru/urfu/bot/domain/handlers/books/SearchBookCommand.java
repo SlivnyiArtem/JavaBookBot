@@ -7,6 +7,7 @@ import ru.urfu.bot.app.UserBookService;
 import ru.urfu.bot.domain.entities.Book;
 import ru.urfu.bot.domain.handlers.Command;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,7 +24,7 @@ public class SearchBookCommand implements Command {
     public SendMessage handle(Update update) {
         Long chatId = update.getMessage().getChatId();
 
-        String query = update.getMessage().getText().split(" ")[1];
+        String query = update.getMessage().getText().substring(update.getMessage().getText().indexOf(" "));
 
         List<Book> bookList = userBookService.getBooksByTitle(query);
         String message = "Результаты поиска:\n%s".formatted(bookList.stream()

@@ -72,16 +72,22 @@ public class BookApiDto {
 
     @JsonProperty("volumeInfo")
     private void unpackNested(Map<String,Object> volumeInfo) {
-        this.title = (String) volumeInfo.get("title");
-        this.description = (String) volumeInfo.get("description");
+        this.title = volumeInfo.get("title") != null ? (String) volumeInfo.get("title") : "";
+        this.description = volumeInfo.get("description") != null ? (String) volumeInfo.get("description") : "";
 
         List<String> authors = (List<String>) volumeInfo.get("authors");
-        this.authors = String.join(", ", authors);
+        if (authors != null) {
+            this.authors = String.join(", ", authors);
+        }
 
-        this.publisher = (String) volumeInfo.get("publisher");
+        this.publisher = volumeInfo.get("publisher") != null ? (String) volumeInfo.get("publisher") : "";
         this.publishedDate = LocalDate.parse((String) volumeInfo.get("publishedDate"));
 
         List<Map<String, String>> identifiers = (List<Map<String, String>>) volumeInfo.get("industryIdentifiers");
-        this.isbn13 = Long.parseLong(identifiers.getFirst().get("identifier"));
+        this.isbn13 = Long.parseLong(identifiers.stream()
+                .filter(map -> map.get("type").equals("ISBN_13"))
+                .findFirst()
+                .orElseThrow()
+                .get("identifier"));
     }
 }
