@@ -1,4 +1,4 @@
-package ru.urfu.bot.app;
+package ru.urfu.bot.domain.port;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -40,6 +40,8 @@ public class UserMessageProcessor {
                     "Неизвестная команда. Введите /help для получения списка команд");
         }
         if (!handler.supports(update)) {
+
+
             return new SendMessage(update.getMessage().getChatId().toString(), "Команда недоступна");
         }
         return handler.handle(update);

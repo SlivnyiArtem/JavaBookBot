@@ -1,4 +1,4 @@
-package ru.urfu.bot.app.port;
+package ru.urfu.bot.data.repInterfaces;
 
 import ru.urfu.bot.domain.entities.User;
 

@@ -1,4 +1,4 @@
-package ru.urfu.bot.infrastructure;
+package ru.urfu.bot.app.port;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
