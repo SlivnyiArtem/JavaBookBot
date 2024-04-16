@@ -40,7 +40,7 @@ public class UserMessageProcessor {
                     "Неизвестная команда. Введите /help для получения списка команд");
         }
         if (!handler.supports(update)) {
-            return new SendMessage(update.getMessage().getChatId().toString(), "Команда не доступна");
+            return new SendMessage(update.getMessage().getChatId().toString(), "Команда недоступна");
         }
         return handler.handle(update);
     }
