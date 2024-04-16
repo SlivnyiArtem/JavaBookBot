@@ -1,4 +1,4 @@
-package ru.urfu.bot.domain.port;
+package ru.urfu.bot.domain.services;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

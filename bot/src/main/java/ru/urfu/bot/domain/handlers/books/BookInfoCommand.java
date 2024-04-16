@@ -5,7 +5,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.urfu.bot.domain.entities.Book;
 import ru.urfu.bot.domain.handlers.Command;
-import ru.urfu.bot.domain.port.UserBookService;
+import ru.urfu.bot.domain.services.UserBookService;
 
 /**
  * Выводит информацию о книге по isbn (в бд)

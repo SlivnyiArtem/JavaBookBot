@@ -1,4 +1,4 @@
-package ru.urfu.bot.infrastructure.config;
+package ru.urfu.bot.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
@@ -10,7 +10,7 @@ import ru.urfu.bot.domain.handlers.Command;
 import ru.urfu.bot.domain.handlers.books.*;
 import ru.urfu.bot.domain.handlers.bot.HelpBotCommand;
 import ru.urfu.bot.domain.handlers.bot.StartBotCommand;
-import ru.urfu.bot.domain.port.UserBookService;
+import ru.urfu.bot.domain.services.UserBookService;
 
 import java.util.Map;
 

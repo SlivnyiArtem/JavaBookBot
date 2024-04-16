@@ -1,4 +1,4 @@
-package ru.urfu.bot.infrastructure.config;
+package ru.urfu.bot.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;

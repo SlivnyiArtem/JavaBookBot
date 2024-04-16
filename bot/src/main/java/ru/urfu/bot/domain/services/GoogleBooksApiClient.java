@@ -1,13 +1,12 @@
-package ru.urfu.bot.app.port;
+package ru.urfu.bot.domain.services;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import ru.urfu.bot.app.port.BookApiClient;
 import ru.urfu.bot.domain.entities.Book;
-import ru.urfu.bot.infrastructure.config.BotProperties;
-import ru.urfu.bot.infrastructure.dto.BookApiDto;
-import ru.urfu.bot.infrastructure.dto.BookListApiDto;
+import ru.urfu.bot.config.BotProperties;
+import ru.urfu.bot.data.dto.BookApiDto;
+import ru.urfu.bot.data.dto.BookListApiDto;
 
 import java.util.List;
 import java.util.NoSuchElementException;

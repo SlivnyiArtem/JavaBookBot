@@ -1,12 +1,11 @@
-package ru.urfu.bot.domain.port;
+package ru.urfu.bot.domain.services;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import ru.urfu.bot.app.port.BookApiClient;
-import ru.urfu.bot.data.repInterfaces.BookRepository;
-import ru.urfu.bot.data.repInterfaces.ChatRepository;
-import ru.urfu.bot.data.repInterfaces.UserRepository;
+import ru.urfu.bot.domain.port.repInterfaces.BookRepository;
+import ru.urfu.bot.domain.port.repInterfaces.ChatRepository;
+import ru.urfu.bot.domain.port.repInterfaces.UserRepository;
 import ru.urfu.bot.domain.entities.Book;
 import ru.urfu.bot.domain.entities.Chat;
 import ru.urfu.bot.domain.entities.User;

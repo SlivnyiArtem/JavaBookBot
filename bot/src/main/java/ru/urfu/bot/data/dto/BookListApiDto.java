@@ -1,4 +1,4 @@
-package ru.urfu.bot.infrastructure.dto;
+package ru.urfu.bot.data.dto;
 
 import java.util.List;
 

@@ -14,11 +14,12 @@ public class ArchitectureTest {
     @Test
     void layersTest() {
         Architectures.layeredArchitecture().consideringOnlyDependenciesInLayers()
+                .layer("data").definedBy(BASE_PACKAGE + ".data..")
                 .layer("domain").definedBy(BASE_PACKAGE + ".domain..")
-                .layer("app").definedBy(BASE_PACKAGE + ".app..")
-                .layer("extern").definedBy(BASE_PACKAGE + ".infrastructure..")
-                .whereLayer("app").mayOnlyBeAccessedByLayers("app", "extern")
-                .whereLayer("extern").mayOnlyBeAccessedByLayers("extern")
+                .layer("infrastructure").definedBy(BASE_PACKAGE + ".infrastructure..")
+                .whereLayer("data").mayOnlyAccessLayers("data")
+                .whereLayer("domain").mayOnlyAccessLayers("domain", "data")
+                .whereLayer("infrastructure").mayOnlyAccessLayers("infrastructure", "domain")
                 .check(CLASSES);
     }
 }
