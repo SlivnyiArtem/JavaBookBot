@@ -4,6 +4,9 @@ import ru.urfu.bot.domain.entities.User;
 
 import java.util.Optional;
 
+/**
+ * Интерфейс хранилища юзеров
+ */
 public interface UserRepository {
 
     Optional<User> findByUserName(String userName);

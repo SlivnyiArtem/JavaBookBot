@@ -16,10 +16,19 @@ public class UserMessageProcessor {
 
     private final Map<String, Command> commands;
 
+    /**
+     *
+     * @param commandMap - автосвязь с бином commandMap
+     */
     public UserMessageProcessor(@Qualifier(value = "commandMap") Map<String, Command> commandMap) {
         this.commands = commandMap;
     }
 
+    /**
+     * формирование орбъекта ответного сообщения
+     * @param update - входящее сообщение
+     * @return   - сформированное ответное сообщение, готовое к отправке
+     */
     public SendMessage process(Update update) {
 
         String command = update.getMessage().getText().split(" ")[0];

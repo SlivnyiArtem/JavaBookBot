@@ -9,7 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 public interface Command {
 
     /**
-     * Метод обрабатывает сообщение пользователя и возварщает ответ
+     * Метод обрабатывает сообщение пользователя и возвращает ответ
      */
     SendMessage handle(Update update);
 
