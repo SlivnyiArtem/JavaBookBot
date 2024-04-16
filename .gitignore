@@ -19,3 +19,4 @@ target/
 mvnw.cmd
 mvnw
 /bot/src/main/java/.env
+/bot/TODO.md
