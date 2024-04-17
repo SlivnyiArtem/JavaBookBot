@@ -20,7 +20,7 @@ spring:
     activate:
       on-profile: development
   datasource:
-    url: jdbc:postgresql://localhost:5432/scrapper
+    url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
     password: postgres
 
@@ -31,12 +31,14 @@ spring:
     activate:
       on-profile: test
   datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-    username: username
-    password:
+    url: jdbc:postgresql://localhost:5432/postgres
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: postgres
+    initialization-mode: always
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
   h2:
     console:
       enabled: true
