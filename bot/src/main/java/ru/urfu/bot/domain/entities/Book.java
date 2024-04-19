@@ -10,6 +10,7 @@ import java.util.Set;
  * Книга, сохраненная в бд
  */
 @Entity
+@Table(name = "BOOK")
 public class Book {
 
     public void setIsbn13(Long isbn13) {

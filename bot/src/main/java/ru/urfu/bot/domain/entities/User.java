@@ -9,7 +9,7 @@ import java.util.Set;
  * Объект пользователя телеграм-бота
  */
 @Entity
-@Table(name = "users")
+@Table(name = "USERS")
 public class User {
 
     public User(String userName) {
