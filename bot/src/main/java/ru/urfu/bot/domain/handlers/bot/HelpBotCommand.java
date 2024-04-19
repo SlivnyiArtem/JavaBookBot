@@ -24,13 +24,14 @@ public class HelpBotCommand implements Command {
         Long chatId = update.getMessage().getChatId();
 
         String message = """
-                /start
-                /search_book {title}
-                /my_books
-                /add_book {isbn}
-                /remove_book {isbn}
-                /help
-                /book_inf {isbn}""";
+                /start - начать работать с ботом
+                /search_book {title} - поиск книги по названию
+                /my_books - вывести список книг
+                /add_book {isbn} - добавить книгу
+                /remove_book {isbn} - убрать книгу
+                /help - помощь
+                /book_inf {isbn} - иинформация о книге
+                """;
 
         return new SendMessage(chatId.toString(), message);
     }

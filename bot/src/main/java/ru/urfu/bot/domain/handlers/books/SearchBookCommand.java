@@ -30,9 +30,10 @@ public class SearchBookCommand implements Command {
 
         List<Book> bookList = userBookService.findBooksByTitle(query);
         String message = "Результаты поиска:\n%s".formatted(bookList.stream()
-                .map(book -> "isbn: %d\nНазвание: %s\nАвторы: %s\nИздатель: %s\nДата издания: %s\n\n".formatted(
+                .map(book -> "isbn: %d\nНазвание: %s\nАвторы: %s\nИздатель: %s\nДата издания: %s\n/add_book %s\n\n".formatted(
                         book.getIsbn13(), book.getTitle(),
-                        book.getAuthors(), book.getPublisher(), book.getPublishedDate()
+                        book.getAuthors(), book.getPublisher(),
+                        book.getPublishedDate(), book.getIsbn13()
                 )).collect(Collectors.joining()));
 
         return new SendMessage(chatId.toString(), message);
