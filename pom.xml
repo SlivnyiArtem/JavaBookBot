@@ -17,7 +17,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
-
+    <commons-codec.version>1.16.1</commons-codec.version>
     <spring-boot.version>3.2.4</spring-boot.version>
     <telegrambots.version>6.9.7.1</telegrambots.version>
     <postgresql.version>42.7.3</postgresql.version>
@@ -33,6 +33,11 @@
 
       <!-- Spring -->
 
+      <dependency>
+        <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
+        <version>${commons-codec.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter</artifactId>
