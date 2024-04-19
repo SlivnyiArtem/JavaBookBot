@@ -16,10 +16,12 @@ public class ArchitectureTest {
         Architectures.layeredArchitecture().consideringOnlyDependenciesInLayers()
                 .layer("data").definedBy(BASE_PACKAGE + ".data..")
                 .layer("domain").definedBy(BASE_PACKAGE + ".domain..")
+                .layer("app").definedBy(BASE_PACKAGE + ".app..")
                 .layer("infrastructure").definedBy(BASE_PACKAGE + ".infrastructure..")
                 .whereLayer("data").mayOnlyAccessLayers("data")
                 .whereLayer("domain").mayOnlyAccessLayers("domain", "data")
-                .whereLayer("infrastructure").mayOnlyAccessLayers("infrastructure", "domain")
+                .whereLayer("app").mayOnlyAccessLayers("app", "domain")
+                .whereLayer("infrastructure").mayOnlyAccessLayers("infrastructure", "app")
                 .check(CLASSES);
     }
 }
