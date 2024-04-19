@@ -3,12 +3,12 @@ package ru.urfu.bot.domain.services;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import ru.urfu.bot.domain.port.repInterfaces.BookRepository;
-import ru.urfu.bot.domain.port.repInterfaces.ChatRepository;
-import ru.urfu.bot.domain.port.repInterfaces.UserRepository;
 import ru.urfu.bot.domain.entities.Book;
 import ru.urfu.bot.domain.entities.Chat;
 import ru.urfu.bot.domain.entities.User;
+import ru.urfu.bot.domain.port.repositories.JpaBookRepository;
+import ru.urfu.bot.domain.port.repositories.JpaChatRepository;
+import ru.urfu.bot.domain.port.repositories.JpaUserRepository;
 
 import java.util.List;
 
@@ -18,15 +18,15 @@ import java.util.List;
 @Service
 public class UserBookServiceImpl implements UserBookService {
 
-    private final UserRepository userRepository;
-    private final ChatRepository chatRepository;
-    private final BookRepository bookRepository;
+    private final JpaUserRepository userRepository;
+    private final JpaChatRepository chatRepository;
+    private final JpaBookRepository bookRepository;
     private final BookApiClient bookApiClient;
 
     public UserBookServiceImpl(
-            UserRepository userRepository,
-            ChatRepository chatRepository,
-            BookRepository bookRepository,
+            JpaUserRepository userRepository,
+            JpaChatRepository chatRepository,
+            JpaBookRepository bookRepository,
             BookApiClient bookApiClient) {
 
         this.bookRepository = bookRepository;
