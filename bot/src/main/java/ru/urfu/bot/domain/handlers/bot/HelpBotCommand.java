@@ -20,7 +20,6 @@ public class HelpBotCommand implements Command {
 
     @Override
     public SendMessage handle(Update update) {
-        String userName = update.getMessage().getChat().getUserName();
         Long chatId = update.getMessage().getChatId();
 
         String message = """

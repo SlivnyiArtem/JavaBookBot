@@ -21,7 +21,11 @@ public class AddBookCommand implements Command {
         this.userBookService = userBookService;
     }
 
-
+    /**
+     * Добавление книги в список избранного
+     * @param update - данные входящего сообщения
+     * @return - сообщение об успешности операции
+     */
     @Override
     public SendMessage handle(Update update) {
         String userName = update.getMessage().getChat().getUserName();

@@ -75,6 +75,7 @@ public class BookApiDto {
 
     @JsonProperty("volumeInfo")
     private void unpackNested(Map<String,Object> volumeInfo) {
+        //TODO тест на распаковку??????
         this.title = volumeInfo.get("title") != null ? (String) volumeInfo.get("title") : "";
         this.description = volumeInfo.get("description") != null ? (String) volumeInfo.get("description") : "";
 
