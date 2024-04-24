@@ -6,6 +6,8 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.urfu.bot.domain.handlers.Command;
 import ru.urfu.bot.domain.services.UserBookService;
 
+import java.util.List;
+
 /**
  * Выводит список доступных комманд
  */
@@ -19,7 +21,7 @@ public class HelpBotCommand implements Command {
     }
 
     @Override
-    public SendMessage handle(Update update) {
+    public List<SendMessage> handle(Update update) {
         Long chatId = update.getMessage().getChatId();
 
         String message = """
@@ -32,7 +34,7 @@ public class HelpBotCommand implements Command {
                 /book_inf {isbn} - иинформация о книге
                 """;
 
-        return new SendMessage(chatId.toString(), message);
+        return List.of(new SendMessage(chatId.toString(), message));
     }
 
     @Override

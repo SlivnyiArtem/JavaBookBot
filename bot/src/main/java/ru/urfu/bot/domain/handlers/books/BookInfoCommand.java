@@ -7,6 +7,7 @@ import ru.urfu.bot.domain.entities.Book;
 import ru.urfu.bot.domain.handlers.Command;
 import ru.urfu.bot.domain.services.UserBookService;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -22,7 +23,7 @@ public class BookInfoCommand implements Command {
     }
 
     @Override
-    public SendMessage handle(Update update) {
+    public List<SendMessage> handle(Update update) {
         String userName = update.getMessage().getChat().getUserName();
         Long chatId = update.getMessage().getChatId();
 
@@ -44,7 +45,7 @@ public class BookInfoCommand implements Command {
             message = "В списке избранного отсутствует книга с данным ISBN: %d".formatted(Long.parseLong(query));
         }
 
-        return new SendMessage(chatId.toString(), message);
+        return List.of(new SendMessage(chatId.toString(), message));
     }
 
     @Override

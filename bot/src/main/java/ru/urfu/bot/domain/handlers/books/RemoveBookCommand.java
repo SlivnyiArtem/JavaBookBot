@@ -7,6 +7,7 @@ import ru.urfu.bot.domain.entities.Book;
 import ru.urfu.bot.domain.handlers.Command;
 import ru.urfu.bot.domain.services.UserBookService;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -22,7 +23,7 @@ public class RemoveBookCommand implements Command {
     }
 
     @Override
-    public SendMessage handle(Update update) {
+    public List<SendMessage> handle(Update update) {
         String userName = update.getMessage().getChat().getUserName();
         Long chatId = update.getMessage().getChatId();
 
@@ -31,9 +32,9 @@ public class RemoveBookCommand implements Command {
         try {
             Book book = userBookService.findBookByIsbn(Long.parseLong(query));
             userBookService.removeBook(userName, book);
-            return new SendMessage(chatId.toString(), "Книга удаленна из избранных");
+            return List.of(new SendMessage(chatId.toString(), "Книга удаленна из избранных"));
         } catch (NoSuchElementException e) {
-            return new SendMessage(chatId.toString(), "Книга не найдена");
+            return List.of(new SendMessage(chatId.toString(), "Книга не найдена"));
         }
     }
 

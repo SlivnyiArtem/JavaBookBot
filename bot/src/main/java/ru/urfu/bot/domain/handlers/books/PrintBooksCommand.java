@@ -24,7 +24,7 @@ public class PrintBooksCommand implements Command {
 
 
     @Override
-    public SendMessage handle(Update update) {
+    public List<SendMessage> handle(Update update) {
         String userName = update.getMessage().getChat().getUserName();
         Long chatId = update.getMessage().getChatId();
 
@@ -34,7 +34,7 @@ public class PrintBooksCommand implements Command {
                         book.getIsbn13(), book.getTitle()
                 )).collect(Collectors.joining()));
 
-        return new SendMessage(chatId.toString(), message);
+        return List.of(new SendMessage(chatId.toString(), message));
     }
 
     @Override

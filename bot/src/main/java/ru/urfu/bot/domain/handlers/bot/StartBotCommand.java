@@ -6,6 +6,8 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.urfu.bot.domain.handlers.Command;
 import ru.urfu.bot.domain.services.UserBookService;
 
+import java.util.List;
+
 /**
  * Запускает бота и записывает пользователя и чат в бд
  */
@@ -19,13 +21,13 @@ public class StartBotCommand implements Command {
     }
 
     @Override
-    public SendMessage handle(Update update) {
+    public List<SendMessage> handle(Update update) {
         String userName = update.getMessage().getChat().getUserName();
         Long chatId = update.getMessage().getChatId();
 
         userBookService.addChat(userName, chatId);
 
-        return new SendMessage(chatId.toString(), "Bot started");
+        return List.of(new SendMessage(chatId.toString(), "Bot started"));
     }
 
     @Override
