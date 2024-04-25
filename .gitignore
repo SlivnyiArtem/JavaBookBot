@@ -18,5 +18,5 @@ target/
 
 mvnw.cmd
 mvnw
-/bot/src/main/java/.env
+.env
 /bot/TODO.md

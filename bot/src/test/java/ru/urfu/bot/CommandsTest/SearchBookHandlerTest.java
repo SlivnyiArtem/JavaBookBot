@@ -12,7 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import ru.urfu.bot.db.entities.Book;
 import ru.urfu.bot.handlers.commands.PrintBooksHandler;
-import ru.urfu.bot.handlers.commands.StartBotHandler;
+import ru.urfu.bot.handlers.commands.SearchBookHandler;
 import ru.urfu.bot.services.UserBookService;
 import ru.urfu.bot.utils.MessageConst;
 import ru.urfu.bot.utils.dto.Command;
@@ -21,7 +21,6 @@ import ru.urfu.bot.utils.dto.CommandType;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
@@ -29,7 +28,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class PrintBooksCommandTest {
+public class SearchBookHandlerTest {
 
     String username = "username";
 
@@ -38,7 +37,7 @@ public class PrintBooksCommandTest {
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     Update update;
 
-    PrintBooksHandler printBooksHandler;
+    SearchBookHandler searchBookHandler;
 
     @Mock
     UserBookService userBookService;
@@ -51,12 +50,11 @@ public class PrintBooksCommandTest {
 
     @BeforeEach
     void init() {
-        printBooksHandler = new PrintBooksHandler(userBookService);
+        searchBookHandler = new SearchBookHandler(userBookService);
     }
 
     private void mockUpdate(String username, Long chatId) {
         when(update.getMessage().getChatId()).thenReturn(chatId);
-        when(update.getMessage().getChat().getUserName()).thenReturn(username);
     }
 
     private void mockUserBookList() {
@@ -79,42 +77,39 @@ public class PrintBooksCommandTest {
         when(book2.getTitle()).thenReturn(title2);
         when(book2.getAuthors()).thenReturn(author2);
         when(book2.getPublishedDate()).thenReturn(publishedDate2);
-
-        when(userBookService.getUserBooks(eq(username))).thenReturn(List.of(book1, book2));
     }
 
     private SendMessage createSendMessage(Long chatId, Book book) {
-        InlineKeyboardButton removeButton = new InlineKeyboardButton();
-        removeButton.setText(MessageConst.REMOVE_BUTTON_TEXT);
-        removeButton.setCallbackData(MessageConst.REMOVE_BUTTON_CALLBACK.formatted(book.getIsbn13()));
-
-        InlineKeyboardButton infoButton = new InlineKeyboardButton();
-        infoButton.setText(MessageConst.INFO_BUTTON_TEXT);
-        infoButton.setCallbackData(MessageConst.INFO_BUTTON_CALLBACK.formatted(book.getIsbn13()));
+        InlineKeyboardButton addButton = new InlineKeyboardButton();
+        addButton.setText(MessageConst.ADD_BUTTON_TEXT);
+        addButton.setCallbackData(MessageConst.ADD_BUTTON_CALLBACK.formatted(book.getIsbn13()));
 
         return SendMessage.builder()
                 .chatId(chatId)
                 .text(MessageConst.BOOK_INFO_SHORT.formatted(book.getIsbn13(), book.getTitle(),
                         book.getAuthors(), book.getPublishedDate()))
-                .replyMarkup(new InlineKeyboardMarkup(List.of(List.of(removeButton, infoButton))))
+                .replyMarkup(new InlineKeyboardMarkup(List.of(List.of(addButton))))
                 .build();
     }
 
     @Test
-    void printBooksTest() {
+    void searchBooksTest() {
         // Arrange
+        String title = "title";
         mockUserBookList();
         mockUpdate(username, chatId);
+
+        when(userBookService.findBooksByTitle(eq(title))).thenReturn(List.of(book1, book2));
 
         List<SendMessage> expected = List.of(
                 createSendMessage(chatId, book1),
                 createSendMessage(chatId, book2)
         );
 
-        Command command = new Command(CommandType.PRINT, "");
+        Command command = new Command(CommandType.SEARCH, title);
 
         // Act
-        List<SendMessage> actual_msg = printBooksHandler.handle(command, update);
+        List<SendMessage> actual_msg = searchBookHandler.handle(command, update);
 
         // Assert
         assertFalse(actual_msg.isEmpty());
@@ -124,15 +119,15 @@ public class PrintBooksCommandTest {
     @Test
     void userNotFoundTest() {
         // Arrange
-        String unavailable_user = "new_user";
+        String title = "fasfesfse";
 
-        mockUpdate(unavailable_user, chatId);
-        doThrow(NoSuchElementException.class).when(userBookService).getUserBooks(eq(unavailable_user));
+        mockUpdate(username, chatId);
+        when(userBookService.findBooksByTitle(title)).thenReturn(List.of());
 
-        Command command = new Command(CommandType.PRINT, "");
+        Command command = new Command(CommandType.SEARCH, title);
 
         // Act
-        List<SendMessage> actual_msg = printBooksHandler.handle(command, update);
+        List<SendMessage> actual_msg = searchBookHandler.handle(command, update);
 
         // Assert
         assertTrue(actual_msg.isEmpty());

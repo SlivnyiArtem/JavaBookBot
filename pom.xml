@@ -26,6 +26,7 @@
     <archunit-junit5.version>1.2.1</archunit-junit5.version>
     <jaxb-api.version>2.3.0</jaxb-api.version>
     <modelmapper.version>3.2.0</modelmapper.version>
+    <commons-lang3.version>3.14.0</commons-lang3.version>
   </properties>
 
   <dependencyManagement>
@@ -125,6 +126,12 @@
         <artifactId>archunit-junit5</artifactId>
         <version>${archunit-junit5.version}</version>
         <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>${commons-lang3.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

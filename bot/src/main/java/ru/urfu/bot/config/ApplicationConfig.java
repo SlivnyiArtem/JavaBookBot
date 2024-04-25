@@ -6,11 +6,13 @@ import org.springframework.context.annotation.Configuration;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
-import ru.urfu.bot.domain.handlers.Command;
-import ru.urfu.bot.domain.handlers.books.*;
-import ru.urfu.bot.domain.handlers.bot.HelpBotCommand;
-import ru.urfu.bot.domain.handlers.bot.StartBotCommand;
-import ru.urfu.bot.domain.services.UserBookService;
+import ru.urfu.bot.handlers.CommandHandler;
+import ru.urfu.bot.handlers.callbacks.AddBookHandler;
+import ru.urfu.bot.handlers.callbacks.BookInfoHandler;
+import ru.urfu.bot.handlers.callbacks.RemoveBookHandler;
+import ru.urfu.bot.handlers.commands.*;
+import ru.urfu.bot.services.UserBookService;
+import ru.urfu.bot.utils.dto.CommandType;
 
 import java.util.Map;
 
@@ -26,18 +28,29 @@ public class ApplicationConfig {
     }
 
     /**
-     * Списко используемых комманд
+     * Обработчики для команда, вводимых пользователем
      */
     @Bean
-    Map<String, Command> commandMap(UserBookService userBookService) {
+    Map<CommandType, CommandHandler> commandMap(UserBookService userBookService) {
         return Map.of(
-                "/start", new StartBotCommand(userBookService),
-                "/search_book", new SearchBookCommand(userBookService),
-                "/add_book", new AddBookCommand(userBookService),
-                "/remove_book", new RemoveBookCommand(userBookService),
-                "/my_books", new PrintBooksCommand(userBookService),
-                "/help", new HelpBotCommand(userBookService),
-                "/book_inf", new BookInfoCommand(userBookService)
+                CommandType.START, new StartBotHandler(userBookService),
+                CommandType.SEARCH, new SearchBookHandler(userBookService),
+                CommandType.PRINT, new PrintBooksHandler(userBookService),
+                CommandType.HELP, new HelpBotHandler(),
+                CommandType.UNKNOWN, new DefaultHandler()
+        );
+    }
+
+    /**
+     * Обработчики для команд, возвращаемых коллбэком
+     */
+    @Bean
+    Map<CommandType, CommandHandler> callbackMap(UserBookService userBookService) {
+        return Map.of(
+                CommandType.ADD, new AddBookHandler(userBookService),
+                CommandType.INFO, new BookInfoHandler(userBookService),
+                CommandType.REMOVE, new RemoveBookHandler(userBookService),
+                CommandType.UNKNOWN, new DefaultHandler()
         );
     }
 
