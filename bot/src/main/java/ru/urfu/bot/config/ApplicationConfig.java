@@ -11,7 +11,11 @@ import ru.urfu.bot.services.handlers.CommandHandler;
 import ru.urfu.bot.services.handlers.callbacks.AddBookService;
 import ru.urfu.bot.services.handlers.callbacks.BookInfoService;
 import ru.urfu.bot.services.handlers.callbacks.RemoveBookService;
-import ru.urfu.bot.services.handlers.commands.*;
+import ru.urfu.bot.services.handlers.commands.StartBotService;
+import ru.urfu.bot.services.handlers.commands.SearchBookService;
+import ru.urfu.bot.services.handlers.commands.PrintBooksService;
+import ru.urfu.bot.services.handlers.commands.HelpBotService;
+import ru.urfu.bot.services.handlers.commands.DefaultHandlerService;
 import ru.urfu.bot.utils.dto.CommandType;
 
 import java.util.Map;

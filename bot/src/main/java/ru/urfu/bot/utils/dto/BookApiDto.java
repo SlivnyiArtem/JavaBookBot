@@ -1,6 +1,7 @@
 package ru.urfu.bot.utils.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -11,6 +12,7 @@ import java.util.NoSuchElementException;
 /**
  * Dto для получения информации о книге из api.
  */
+@JsonNaming
 public class BookApiDto {
 
     public String getTitle() {
