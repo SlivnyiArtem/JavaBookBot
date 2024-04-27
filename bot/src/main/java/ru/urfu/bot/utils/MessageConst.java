@@ -13,10 +13,6 @@ public class MessageConst {
 
     public static final String BOOK_INFO_SHORT = "isbn: %d\nНазвание: %s\nАвторы: %s\nДата издания: %s";
 
-    public static final String BOOK_NOT_FOUND_IN_FAVORITE = "В списке избранного отсутствует книга с данным ISBN: %d";
-
-    public static final String BOOK_NOT_FOUND_IN_SOURCE = "В базе данных отсутствует книга с данным ISBN: %d";
-
     public static final String ADD_BUTTON_CALLBACK = "/add_book %d";
 
     public static final String REMOVE_BUTTON_CALLBACK = "/remove_book %d";
@@ -38,5 +34,7 @@ public class MessageConst {
                 /help - помощь
                 """;
 
-    public static final String BOT_STARTED = "Новая сессия";
+    public static final String INTERNAL_ERROR = "Внутренняя ошибка сервера";
+
+    public static final String EMPTY_LIST = "Книги не найдены";
 }

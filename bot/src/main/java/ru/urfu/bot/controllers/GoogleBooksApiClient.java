@@ -31,8 +31,8 @@ public class GoogleBooksApiClient {
     /**
      * Возвращает список книг, найденных через api. Ищет по названию книги
      */
-    public List<Book> findBooksByName(String name) {
-        BookListApiDto bookListApiDto= webClient.get()
+    public List<Book> findBooksByTitle(String name) {
+        BookListApiDto bookListApiDto = webClient.get()
                 .uri("/volumes?q={name}", name)
                 .retrieve()
                 .bodyToMono(BookListApiDto.class)
@@ -46,7 +46,7 @@ public class GoogleBooksApiClient {
                 .stream()
                 .filter(bookApiDto -> bookApiDto.getIsbn13() != null)
                 .map(bookApiDto -> modelMapper.map(bookApiDto, Book.class))
-                .limit(10)
+                .limit(5)
                 .toList();
     }
 

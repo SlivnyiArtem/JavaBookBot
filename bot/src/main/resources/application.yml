@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: develop
+    active: debug    # поменять чтобы сменить профиль
   application:
     name: bot
 
@@ -14,8 +14,6 @@ app:
   book-api-base-url: https://www.googleapis.com/books/v1
 
 ---
-
-logging.level.org.springframework.web: trace
 
 spring:
   config:
@@ -33,10 +31,15 @@ spring:
 
 ---
 
+logging:
+  level:
+    org.hibernate: error
+    springframework.web: trace
+
 spring:
   config:
     activate:
-      on-profile: test
+      on-profile: debug
   h2:
     console:
       enabled: true

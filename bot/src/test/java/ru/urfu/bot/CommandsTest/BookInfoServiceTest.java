@@ -3,62 +3,51 @@ package ru.urfu.bot.CommandsTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Answers;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
-import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.urfu.bot.db.entities.Book;
-import ru.urfu.bot.handlers.callbacks.BookInfoHandler;
-import ru.urfu.bot.services.UserBookService;
+import ru.urfu.bot.db.exceptions.BookNotFoundException;
+import ru.urfu.bot.db.repositories.JpaBookRepository;
+import ru.urfu.bot.services.handlers.callbacks.BookInfoService;
 import ru.urfu.bot.utils.MessageConst;
 import ru.urfu.bot.utils.dto.Command;
 import ru.urfu.bot.utils.dto.CommandType;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class BookInfoHandlerTest {
+public class BookInfoServiceTest {
 
-    String username = "username";
+    private final String username = "username";
 
-    long chatId = 1;
+    private final String chatId = "1";
 
-    BookInfoHandler bookInfoHandler;
+    private final long isbn = 1;
+
+    private BookInfoService bookInfoService;
 
     @Mock
-    UserBookService userBookService;
+    private JpaBookRepository bookRepository;
 
     @Mock
-    Book book;
-
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    Update update;
+    private Book book;
 
     @BeforeEach
     void init() {
-        bookInfoHandler = new BookInfoHandler(userBookService);
-    }
-
-    private void mockUpdate(String username, Long chatId) {
-        Mockito.when(update.getCallbackQuery().getMessage().getChatId()).thenReturn(chatId);
-        Mockito.when(update.getCallbackQuery().getFrom().getUserName()).thenReturn(username);
+        bookInfoService = new BookInfoService(bookRepository);
     }
 
     @Test
     void sendCorrectInfoTest() {
         // Arrange
-        long isbn = 1;
         String title = "title";
         String description = "description";
         String author = "author";
@@ -72,9 +61,7 @@ public class BookInfoHandlerTest {
         when(book.getPublisher()).thenReturn(publisher);
         when(book.getPublishedDate()).thenReturn(publishedDate);
 
-        when(userBookService.findBookByIsbn(eq(username), eq(isbn))).thenReturn(Optional.of(book));
-
-        mockUpdate(username, chatId);
+        when(bookRepository.findByIsbn13AndUsers_UserName(eq(isbn), eq(username))).thenReturn(Optional.of(book));
 
         Command command = new Command(CommandType.INFO, Long.toString(isbn));
         SendMessage expected = SendMessage.builder()
@@ -83,10 +70,10 @@ public class BookInfoHandlerTest {
                 .build();
 
         // Act
-        List<SendMessage> actual_msg = bookInfoHandler.handle(command, update);
+        List<SendMessage> actual_msg = bookInfoService.handle(command, username, chatId);
 
         // Assert
-        verify(userBookService).findBookByIsbn(username, isbn);
+        verify(bookRepository).findByIsbn13AndUsers_UserName(isbn, username);
         assertFalse(actual_msg.isEmpty());
         assertEquals(expected, actual_msg.getFirst());
     }
@@ -94,19 +81,18 @@ public class BookInfoHandlerTest {
     @Test
     void bookNotFoundTest() {
         // Arrange
-        long isbn = 2;
-        when(userBookService.findBookByIsbn(eq(username), eq(isbn))).thenReturn(Optional.empty());
-        mockUpdate(username, chatId);
+        when(bookRepository.findByIsbn13AndUsers_UserName(eq(isbn), eq(username))).thenReturn(Optional.empty());
+
         Command command = new Command(CommandType.INFO, Long.toString(isbn));
         SendMessage expected = SendMessage.builder()
-                .chatId(chatId).text(MessageConst.BOOK_NOT_FOUND_IN_FAVORITE.formatted(isbn))
+                .chatId(chatId).text(MessageConst.INTERNAL_ERROR)
                 .build();
 
         // Act
-        List<SendMessage> actual_msg = bookInfoHandler.handle(command, update);
+        List<SendMessage> actual_msg = bookInfoService.handle(command, username, chatId);
 
         // Assert
-        verify(userBookService).findBookByIsbn(username, isbn);
+        verify(bookRepository).findByIsbn13AndUsers_UserName(isbn, username);
         assertFalse(actual_msg.isEmpty());
         assertEquals(expected, actual_msg.getFirst());
     }
@@ -114,19 +100,21 @@ public class BookInfoHandlerTest {
     @Test
     void userNotFoundTest() {
         // Arrange
-        long isbn = 1;
-        String unavailable_user = "new_user";
-
-        doThrow(NoSuchElementException.class).when(userBookService).findBookByIsbn(eq(unavailable_user), eq(isbn));
-        mockUpdate(unavailable_user, chatId);
+        doThrow(BookNotFoundException.class)
+                .when(bookRepository)
+                .findByIsbn13AndUsers_UserName(eq(isbn), eq(username));
 
         Command command = new Command(CommandType.INFO, Long.toString(isbn));
+        SendMessage expected = SendMessage.builder()
+                .chatId(chatId).text(MessageConst.INTERNAL_ERROR)
+                .build();
 
         // Act
-        List<SendMessage> actual_msg = bookInfoHandler.handle(command, update);
+        List<SendMessage> actual_msg = bookInfoService.handle(command, username, chatId);
 
         // Assert
-        verify(userBookService).findBookByIsbn(unavailable_user, isbn);
-        assertTrue(actual_msg.isEmpty());
+        verify(bookRepository).findByIsbn13AndUsers_UserName(isbn, username);
+        assertFalse(actual_msg.isEmpty());
+        assertEquals(expected, actual_msg.getFirst());
     }
 }

@@ -1,15 +1,15 @@
 package ru.urfu.bot.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import ru.urfu.bot.utils.MessageConst;
+import ru.urfu.bot.services.handlers.CommandHandler;
 import ru.urfu.bot.utils.dto.Command;
 import ru.urfu.bot.utils.dto.CommandType;
-import ru.urfu.bot.handlers.CommandHandler;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +25,8 @@ public class UserMessageProcessor {
 
     private final Parser parser;
 
+    private final static Logger LOG = LoggerFactory.getLogger(UserMessageProcessor.class);
+
     /**
      * @param commandMap обработчики для команд
      * @param callbacks обработчики коллэков
@@ -39,39 +41,44 @@ public class UserMessageProcessor {
         this.parser = parser;
     }
 
+    // TODO fix dependency; fix search command bugs
     /**
      * Парсит обновление и формирует ответ для пользователя.
      * @param update входящее сообщение
      * @return список сформированных ответных сообщений
      */
     public List<SendMessage> process(Update update) {
-        if (update.hasMessage() && update.getMessage().hasText()
-                && update.getMessage().getText().startsWith("/")) {
+
+        if (update.hasMessage() && update.getMessage().hasText()) {
             Command command = parser.parseCommand(update);
 
             CommandHandler handler = commands.get(command.commandType());
 
-            List<SendMessage> response = new ArrayList<>();
+            String username = update.getMessage().getChat().getUserName();
+            String chatId = update.getMessage().getChatId().toString();
 
-            if (!handler.supports(update)) {
-                if (commands.containsKey(CommandType.START)) {
-                    response.addAll(commands.get(CommandType.START).handle(
-                            new Command(CommandType.START, ""), update));
-                } else {
-                    // TODO logger
-                    return List.of();
-                }
-            }
-            response.addAll(handler.handle(command, update));
-            return response;
+            addUserIfAbsent(commands, username, chatId);
+
+            return handler.handle(command, username, chatId);
         } else if (update.hasCallbackQuery()) {
             Command command = parser.parseCallback(update);
 
             CommandHandler handler = callbacks.get(command.commandType());
 
-            return handler.handle(command, update);
+            String username = update.getCallbackQuery().getFrom().getUserName();
+            String chatId = update.getCallbackQuery().getMessage().getChatId().toString();
+
+            addUserIfAbsent(callbacks, username, chatId);
+
+            return handler.handle(command, username, chatId);
         } else {
-            return List.of(new SendMessage(update.getMessage().getChatId().toString(), MessageConst.UNKNOWN_COMMAND));
+            LOG.error("don't supported update received");
+            return List.of();
         }
+    }
+
+    private void addUserIfAbsent(Map<CommandType, CommandHandler> map, String username, String chatId) {
+        Command startCommand = new Command(CommandType.START, "");
+        map.get(startCommand.commandType()).handle(startCommand, username, chatId);
     }
 }
