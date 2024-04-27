@@ -56,6 +56,12 @@
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter</artifactId>
+        <exclusions>
+          <exclusion>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
+          </exclusion>
+        </exclusions>
         <version>${spring-boot.version}</version>
       </dependency>
       <dependency>
@@ -122,6 +128,29 @@
       </dependency>
 
       <!-- Tests -->
+      <dependency>
+        <groupId>com.github.valfirst</groupId>
+        <artifactId>slf4j-test</artifactId>
+        <version>3.0.1</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>uk.org.lidalia</groupId>
+        <artifactId>slf4j-test</artifactId>
+        <version>1.2.0</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>2.0.13</version>
+      </dependency>
+
+<!--      <dependency>-->
+<!--        <groupId>org.slf4j</groupId>-->
+<!--        <artifactId>slf4j-reload4j</artifactId>-->
+<!--        <version>2.0.13</version>-->
+<!--      </dependency>-->
 
       <dependency>
         <groupId>junit</groupId>
