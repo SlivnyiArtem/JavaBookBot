@@ -28,6 +28,12 @@
     <commons-lang3.version>3.14.0</commons-lang3.version>
     <org.springframework.boot.version>3.2.5</org.springframework.boot.version>
     <mockito.version>5.11.0</mockito.version>
+    <com.github.valfirst.version>3.0.1</com.github.valfirst.version>
+    <uk.org.lidalia.version>1.2.0</uk.org.lidalia.version>
+    <org.slf4j.version>2.0.13</org.slf4j.version>
+    <byte-buddy.version>1.14.14</byte-buddy.version>
+    <junit.version>4.13.2</junit.version>
+
 
   </properties>
 
@@ -119,34 +125,27 @@
 
       <!-- Tests -->
       <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
         <groupId>com.github.valfirst</groupId>
         <artifactId>slf4j-test</artifactId>
-        <version>3.0.1</version>
+        <version>${com.github.valfirst.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>uk.org.lidalia</groupId>
         <artifactId>slf4j-test</artifactId>
-        <version>1.2.0</version>
+        <version>${uk.org.lidalia.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>2.0.13</version>
-      </dependency>
-
-<!--      <dependency>-->
-<!--        <groupId>org.slf4j</groupId>-->
-<!--        <artifactId>slf4j-reload4j</artifactId>-->
-<!--        <version>2.0.13</version>-->
-<!--      </dependency>-->
-
-      <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-core</artifactId>
-        <version>${mocktio-core.version}</version>
-        <scope>test</scope>
+        <version>${org.slf4j.version}</version>
       </dependency>
 
       <!-- Other -->

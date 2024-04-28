@@ -92,7 +92,6 @@ public class BookApiDto {
         this.publisher = volumeInfo.get("publisher") != null ? (String) volumeInfo.get("publisher") : "";
 
         try {
-            System.out.println(volumeInfo.get("publishedDate"));
             this.publishedDate = LocalDate.parse((String) volumeInfo.get("publishedDate"));
         } catch (DateTimeParseException e) {
             LOG.error(String.format("incorrect published date of %s", title), e);
