@@ -47,6 +47,7 @@ public class ApplicationConfig {
     @Bean
     Map<CommandType, CommandHandler> callbackMap(ApplicationContext context) {
         return Map.of(
+                CommandType.START, context.getBean(StartBotService.class),
                 CommandType.ADD, context.getBean(AddBookService.class),
                 CommandType.INFO, context.getBean(BookInfoService.class),
                 CommandType.REMOVE, context.getBean(RemoveBookService.class),
