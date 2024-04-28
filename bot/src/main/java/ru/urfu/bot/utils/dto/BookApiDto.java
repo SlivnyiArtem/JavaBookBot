@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import ru.urfu.bot.services.handlers.callbacks.AddBookService;
-import ru.urfu.bot.utils.MessageConst;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;

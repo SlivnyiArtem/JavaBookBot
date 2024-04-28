@@ -3,29 +3,33 @@ package ru.urfu.bot;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import junit.framework.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import uk.org.lidalia.slf4jtest.TestLogger;
-import uk.org.lidalia.slf4jtest.TestLoggerFactory;
-import ru.urfu.bot.utils.dto.BookApiDto;
 
+import com.github.valfirst.slf4jtest.TestLogger;
+import com.github.valfirst.slf4jtest.TestLoggerFactory;
+import org.slf4j.event.Level;
+import ru.urfu.bot.services.handlers.callbacks.AddBookService;
+import ru.urfu.bot.utils.dto.BookApiDto;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.extension.ExtendWith;
+import com.github.valfirst.slf4jtest.TestLoggerFactoryExtension;
+
 import static junit.framework.Assert.assertEquals;
 
+@ExtendWith(TestLoggerFactoryExtension.class)
 public class JsonUnpackTest {
 
-
-    @Mock
+    private TestLogger logger;
     private BookApiDto bookApiDto;
 
     @BeforeEach
     void init() {
         bookApiDto = new BookApiDto();
+        logger = TestLoggerFactory.getTestLogger(AddBookService.class);
     }
 
     @Test
@@ -55,17 +59,16 @@ public class JsonUnpackTest {
 
     @Test
     public void testIncorrectIsbn() throws JsonProcessingException {
-        TestLogger logger = TestLoggerFactory.getTestLogger(BookApiDto.class);
-
-        BookApiDto bookApiDto = new BookApiDto();
-        bookApiDto.unpackNested(Map.of("industryIdentifiers", List.of(Map.of("type", "ISBN_13","identifier","ast-tree")),
-                "title", "title",
+        bookApiDto.unpackNested(Map.of("industryIdentifiers", List.of(Map.of("type", "tree","identifier","ast-tree")),
+                "title", "title1",
                 "publishedDate", "2023-11-08",
                 "authors", List.of("author1, author2"),
                 "description", "description",
                 "publisher", "publisher1"));
 
-        Assert.assertEquals("k", logger.getLoggingEvents().asList().getFirst().getMessage());
+
+        assertEquals("no isbn of title1", logger.getLoggingEvents().getFirst().getFormattedMessage());
+        assertEquals(Level.ERROR, logger.getLoggingEvents().getFirst().getLevel());
 
 
 
@@ -73,7 +76,20 @@ public class JsonUnpackTest {
     }
     @Test
     public void testIncorrectPublishedDate() throws JsonProcessingException {
+        bookApiDto.unpackNested(Map.of("industryIdentifiers", List.of(Map.of("type", "ISBN_13","identifier","1")),
+                "title", "title2",
+                "publishedDate", "2023-15-08",
+                "authors", List.of("author1, author2"),
+                "description", "description",
+                "publisher", "publisher1"));
 
+
+        assertEquals("incorrect published date of title2", logger.getLoggingEvents().getFirst().getFormattedMessage());
+        assertEquals(Level.ERROR, logger.getLoggingEvents().getFirst().getLevel());
+
+        //FIXME возможно стоит напрямую сравнивать объекты исключений, но по моему это лишнее
+//        assertEquals(new DateTimeParseException("Text '2023-15-08' could not be parsed: Invalid value for MonthOfYear (valid values 1 - 12): 15", "2023-15-08", 0),
+//                logger.getLoggingEvents().getFirst().getThrowable().get());
     }
 
     @Test
