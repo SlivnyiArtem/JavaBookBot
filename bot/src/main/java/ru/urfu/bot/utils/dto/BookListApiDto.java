@@ -20,6 +20,8 @@ public class BookListApiDto {
     }
 
     public Long getTotalItems() {
+        if (totalItems == null)
+            return 0L;
         return totalItems;
     }
 

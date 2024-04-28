@@ -3,6 +3,7 @@ package ru.urfu.bot;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -49,12 +50,12 @@ public class JsonUnpackTest {
                 .readerFor(BookApiDto.class)
                 .readValue(source_json);
 
-        assertEquals("title", bookApiDto.getTitle());
-        assertEquals("description", bookApiDto.getDescription());
-        assertEquals("author1, author2", bookApiDto.getAuthors());
-        assertEquals("publisher1", bookApiDto.getPublisher());
-        assertEquals(bookApiDto.getPublishedDate(), LocalDate.of(2023, 12, 8));
-        assertEquals(bookApiDto.getIsbn13(), Long.valueOf(1));
+        Assertions.assertEquals("title", bookApiDto.getTitle());
+        Assertions.assertEquals("description", bookApiDto.getDescription());
+        Assertions.assertEquals("author1, author2", bookApiDto.getAuthors());
+        Assertions.assertEquals("publisher1", bookApiDto.getPublisher());
+        Assertions.assertEquals(bookApiDto.getPublishedDate(), LocalDate.of(2023, 12, 8));
+        Assertions.assertEquals(bookApiDto.getIsbn13(), Long.valueOf(1));
     }
 
     @Test
@@ -67,8 +68,8 @@ public class JsonUnpackTest {
                 "publisher", "publisher1"));
 
 
-        assertEquals("no isbn of title1", logger.getLoggingEvents().getFirst().getFormattedMessage());
-        assertEquals(Level.ERROR, logger.getLoggingEvents().getFirst().getLevel());
+        Assertions.assertEquals("no isbn of title1", logger.getLoggingEvents().getFirst().getFormattedMessage());
+        Assertions.assertEquals(Level.ERROR, logger.getLoggingEvents().getFirst().getLevel());
 
 
 
@@ -84,8 +85,8 @@ public class JsonUnpackTest {
                 "publisher", "publisher1"));
 
 
-        assertEquals("incorrect published date of title2", logger.getLoggingEvents().getFirst().getFormattedMessage());
-        assertEquals(Level.ERROR, logger.getLoggingEvents().getFirst().getLevel());
+        Assertions.assertEquals("incorrect published date of title2", logger.getLoggingEvents().getFirst().getFormattedMessage());
+        Assertions.assertEquals(Level.ERROR, logger.getLoggingEvents().getFirst().getLevel());
 
         //FIXME возможно стоит напрямую сравнивать объекты исключений, но по моему это лишнее
 //        assertEquals(new DateTimeParseException("Text '2023-15-08' could not be parsed: Invalid value for MonthOfYear (valid values 1 - 12): 15", "2023-15-08", 0),
@@ -101,11 +102,11 @@ public class JsonUnpackTest {
                 "authors", List.of("author1, author2"),
                 "description", "description",
                 "publisher", "publisher1"));
-        assertEquals("title", bookApiDto.getTitle());
-        assertEquals("description", bookApiDto.getDescription());
-        assertEquals("author1, author2", bookApiDto.getAuthors());
-        assertEquals("publisher1", bookApiDto.getPublisher());
-        assertEquals(bookApiDto.getPublishedDate(), LocalDate.of(2023, 11, 8));
-        assertEquals(bookApiDto.getIsbn13(), Long.valueOf(1));
+        Assertions.assertEquals("title", bookApiDto.getTitle());
+        Assertions.assertEquals("description", bookApiDto.getDescription());
+        Assertions.assertEquals("author1, author2", bookApiDto.getAuthors());
+        Assertions.assertEquals("publisher1", bookApiDto.getPublisher());
+        Assertions.assertEquals(bookApiDto.getPublishedDate(), LocalDate.of(2023, 11, 8));
+        Assertions.assertEquals(bookApiDto.getIsbn13(), Long.valueOf(1));
     }
 }
