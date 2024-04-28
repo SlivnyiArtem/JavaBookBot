@@ -17,16 +17,17 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
+
     <commons-codec.version>1.16.1</commons-codec.version>
     <spring-boot.version>3.2.4</spring-boot.version>
     <telegrambots.version>6.9.7.1</telegrambots.version>
     <postgresql.version>42.7.3</postgresql.version>
     <h2.version>2.2.224</h2.version>
-    <junit.version>3.8.1</junit.version>
-    <archunit-junit5.version>1.2.1</archunit-junit5.version>
     <jaxb-api.version>2.3.0</jaxb-api.version>
     <modelmapper.version>3.2.0</modelmapper.version>
     <commons-lang3.version>3.14.0</commons-lang3.version>
+    <mocktio-core.version>5.11.0</mocktio-core.version>
+    <byte-buddy.version>1.14.13</byte-buddy.version>
   </properties>
 
   <dependencyManagement>
@@ -35,26 +36,23 @@
       <!-- Spring -->
 
       <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-core</artifactId>
-        <version>5.11.0</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
         <version>${commons-codec.version}</version>
       </dependency>
+
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter</artifactId>
         <version>${spring-boot.version}</version>
       </dependency>
+
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-web</artifactId>
         <version>${spring-boot.version}</version>
       </dependency>
+
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-test</artifactId>
@@ -68,9 +66,9 @@
       </dependency>
 
       <dependency>
-        <groupId>org.telegram</groupId>
-        <artifactId>telegrambots</artifactId>
-        <version>${telegrambots.version}</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+        <version>${spring-boot.version}</version>
       </dependency>
 
       <dependency>
@@ -79,32 +77,20 @@
         <version>${spring-boot.version}</version>
       </dependency>
 
-      <dependency>
-        <groupId>org.modelmapper</groupId>
-        <artifactId>modelmapper</artifactId>
-        <version>${modelmapper.version}</version>
-      </dependency>
-
       <!-- Database -->
 
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-data-jpa</artifactId>
-        <version>${spring-boot.version}</version>
-      </dependency>
       <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
         <version>${postgresql.version}</version>
         <scope>runtime</scope>
       </dependency>
+
       <dependency>
         <groupId>javax.xml.bind</groupId>
         <artifactId>jaxb-api</artifactId>
         <version>${jaxb-api.version}</version>
       </dependency>
-
-      <!-- test db -->
 
       <dependency>
         <groupId>com.h2database</groupId>
@@ -116,16 +102,18 @@
       <!-- Tests -->
 
       <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>${junit.version}</version>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${mocktio-core.version}</version>
         <scope>test</scope>
       </dependency>
+
+      <!-- Other -->
+
       <dependency>
-        <groupId>com.tngtech.archunit</groupId>
-        <artifactId>archunit-junit5</artifactId>
-        <version>${archunit-junit5.version}</version>
-        <scope>test</scope>
+        <groupId>org.telegram</groupId>
+        <artifactId>telegrambots</artifactId>
+        <version>${telegrambots.version}</version>
       </dependency>
 
       <dependency>
@@ -133,6 +121,19 @@
         <artifactId>commons-lang3</artifactId>
         <version>${commons-lang3.version}</version>
       </dependency>
+
+      <dependency>
+        <groupId>org.modelmapper</groupId>
+        <artifactId>modelmapper</artifactId>
+        <version>${modelmapper.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.bytebuddy</groupId>
+        <artifactId>byte-buddy</artifactId>
+        <version>${byte-buddy.version}</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
