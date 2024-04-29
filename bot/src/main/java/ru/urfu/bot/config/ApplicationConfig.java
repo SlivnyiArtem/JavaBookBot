@@ -11,11 +11,7 @@ import ru.urfu.bot.services.handlers.CommandHandler;
 import ru.urfu.bot.services.handlers.callbacks.AddBookService;
 import ru.urfu.bot.services.handlers.callbacks.BookInfoService;
 import ru.urfu.bot.services.handlers.callbacks.RemoveBookService;
-import ru.urfu.bot.services.handlers.commands.StartBotService;
-import ru.urfu.bot.services.handlers.commands.SearchBookService;
-import ru.urfu.bot.services.handlers.commands.PrintBooksService;
-import ru.urfu.bot.services.handlers.commands.HelpBotService;
-import ru.urfu.bot.services.handlers.commands.DefaultHandlerService;
+import ru.urfu.bot.services.handlers.commands.*;
 import ru.urfu.bot.utils.dto.CommandType;
 
 import java.util.Map;
@@ -41,17 +37,6 @@ public class ApplicationConfig {
                 CommandType.SEARCH, context.getBean(SearchBookService.class),
                 CommandType.PRINT, context.getBean(PrintBooksService.class),
                 CommandType.HELP, context.getBean(HelpBotService.class),
-                CommandType.UNKNOWN, context.getBean(DefaultHandlerService.class)
-        );
-    }
-
-    /**
-     * Обработчики для команд, возвращаемых коллбэком
-     */
-    @Bean
-    Map<CommandType, CommandHandler> callbackMap(ApplicationContext context) {
-        return Map.of(
-                CommandType.START, context.getBean(StartBotService.class),
                 CommandType.ADD, context.getBean(AddBookService.class),
                 CommandType.INFO, context.getBean(BookInfoService.class),
                 CommandType.REMOVE, context.getBean(RemoveBookService.class),
