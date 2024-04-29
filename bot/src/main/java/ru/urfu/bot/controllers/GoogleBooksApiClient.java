@@ -49,6 +49,7 @@ public class GoogleBooksApiClient {
                 .getItems()
                 .stream()
                 .filter(bookApiDto -> bookApiDto.getIsbn13() != null)
+                // этот фильтр замедляет вывод; нужен потому, что некоторые книги нельзя найти по isbn
                 .filter(bookApiDto -> findBookByIsbn(bookApiDto.getIsbn13()).isPresent())
                 .map(bookApiDto -> modelMapper.map(bookApiDto, Book.class))
                 .limit(5)

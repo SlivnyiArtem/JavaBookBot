@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.urfu.bot.services.handlers.callbacks.AddBookService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -20,7 +19,7 @@ import java.util.stream.Collectors;
 @JsonNaming
 public class BookApiDto {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AddBookService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BookApiDto.class);
 
     public String getTitle() {
         return title;

@@ -36,17 +36,13 @@ logging:
     org.hibernate: error
     org.springframework.web: debug
 
-server:
-  error:
-    include-stacktrace: never
-
 spring:
-  output:
-    ansi:
-      enabled: ALWAYS
   config:
     activate:
       on-profile: debug
+  output:
+    ansi:
+      enabled: ALWAYS
   h2:
     console:
       enabled: true
