@@ -1,6 +1,10 @@
 package ru.urfu.bot.utils.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.urfu.bot.services.handlers.callbacks.AddBookService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -11,7 +15,9 @@ import java.util.NoSuchElementException;
 /**
  * Dto для получения информации о книге из api.
  */
+@JsonNaming
 public class BookApiDto {
+    private static final Logger LOG = LoggerFactory.getLogger(AddBookService.class);
 
     public String getTitle() {
         return title;
@@ -88,6 +94,7 @@ public class BookApiDto {
         try {
             this.publishedDate = LocalDate.parse((String) volumeInfo.get("publishedDate"));
         } catch (DateTimeParseException e) {
+            LOG.error(String.format("incorrect published date of %s", title), e);
         }
 
         List<Map<String, String>> identifiers = (List<Map<String, String>>) volumeInfo.get("industryIdentifiers");
@@ -99,6 +106,7 @@ public class BookApiDto {
                     .orElseThrow()
                     .get("identifier"));
         } catch (NoSuchElementException e) {
+            LOG.error(String.format("no isbn of %s", title), e);
         }
     }
 }

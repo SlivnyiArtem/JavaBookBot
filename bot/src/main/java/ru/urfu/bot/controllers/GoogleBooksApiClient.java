@@ -38,7 +38,7 @@ public class GoogleBooksApiClient {
                 .bodyToMono(BookListApiDto.class)
                 .block();
 
-        if (bookListApiDto.getTotalItems() == 0) {
+        if (bookListApiDto == null || bookListApiDto.getTotalItems() == 0) {
             return List.of();
         }
         return bookListApiDto
@@ -60,7 +60,7 @@ public class GoogleBooksApiClient {
                 .bodyToMono(BookListApiDto.class)
                 .block();
 
-        if (bookListApiDto.getTotalItems() == 0) {
+        if (bookListApiDto == null || bookListApiDto.getTotalItems() == 0) {
             return Optional.empty();
         }
         BookApiDto bookApiDto = bookListApiDto.getItems()
