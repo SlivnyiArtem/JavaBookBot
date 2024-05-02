@@ -1,112 +1,144 @@
 package ru.urfu.bot;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import com.github.valfirst.slf4jtest.TestLogger;
-import com.github.valfirst.slf4jtest.TestLoggerFactory;
-import org.slf4j.event.Level;
-import ru.urfu.bot.services.handlers.callbacks.AddBookService;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import ru.urfu.bot.utils.dto.BookApiDto;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
-import org.junit.jupiter.api.extension.ExtendWith;
-import com.github.valfirst.slf4jtest.TestLoggerFactoryExtension;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import static junit.framework.Assert.assertEquals;
 
-@ExtendWith(TestLoggerFactoryExtension.class)
 public class JsonUnpackTest {
 
-    private TestLogger logger;
     private BookApiDto bookApiDto;
 
     @BeforeEach
     void init() {
         bookApiDto = new BookApiDto();
-        logger = TestLoggerFactory.getTestLogger(AddBookService.class);
     }
 
-    @Test
-    public void testCorrectInitialization() throws JsonProcessingException {
-        String source_json =
-                """
-               {
-               "isbn13": 1,
-               "title": "title",
-               "publishedDate": "2023-12-08",
-               "authors": "author1, author2",
-               "description": "description",
-               "publisher": "publisher1"
-               }""";
-
-        BookApiDto bookApiDto = new ObjectMapper().registerModule(new JavaTimeModule())
-                .readerFor(BookApiDto.class)
-                .readValue(source_json);
-
-        Assertions.assertEquals("title", bookApiDto.getTitle());
-        Assertions.assertEquals("description", bookApiDto.getDescription());
-        Assertions.assertEquals("author1, author2", bookApiDto.getAuthors());
-        Assertions.assertEquals("publisher1", bookApiDto.getPublisher());
-        Assertions.assertEquals(bookApiDto.getPublishedDate(), LocalDate.of(2023, 12, 8));
-        Assertions.assertEquals(bookApiDto.getIsbn13(), Long.valueOf(1));
+    private void assertInfo(Long isbn, String title, String description,
+                            String authors, String publisher, LocalDate publishedDate) {
+        assertEquals(isbn, bookApiDto.getIsbn13());
+        assertEquals(title, bookApiDto.getTitle());
+        assertEquals(description, bookApiDto.getDescription());
+        assertEquals(authors, bookApiDto.getAuthors());
+        assertEquals(publisher, bookApiDto.getPublisher());
+        assertEquals(publishedDate, bookApiDto.getPublishedDate());
     }
 
-    @Test
-    public void testIncorrectIsbn() throws JsonProcessingException {
-        bookApiDto.unpackNested(Map.of("industryIdentifiers", List.of(Map.of("type", "tree","identifier","ast-tree")),
-                "title", "title1",
-                "publishedDate", "2023-11-08",
-                "authors", List.of("author1, author2"),
-                "description", "description",
-                "publisher", "publisher1"));
-
-
-        Assertions.assertEquals("no isbn of title1", logger.getLoggingEvents().getFirst().getFormattedMessage());
-        Assertions.assertEquals(Level.ERROR, logger.getLoggingEvents().getFirst().getLevel());
-
-
-
-
-    }
-    @Test
-    public void testIncorrectPublishedDate() throws JsonProcessingException {
-        bookApiDto.unpackNested(Map.of("industryIdentifiers", List.of(Map.of("type", "ISBN_13","identifier","1")),
-                "title", "title2",
-                "publishedDate", "2023-15-08",
-                "authors", List.of("author1, author2"),
-                "description", "description",
-                "publisher", "publisher1"));
-
-
-        Assertions.assertEquals("incorrect published date of title2", logger.getLoggingEvents().getFirst().getFormattedMessage());
-        Assertions.assertEquals(Level.ERROR, logger.getLoggingEvents().getFirst().getLevel());
-
-        //FIXME возможно стоит напрямую сравнивать объекты исключений, но по моему это лишнее
-//        assertEquals(new DateTimeParseException("Text '2023-15-08' could not be parsed: Invalid value for MonthOfYear (valid values 1 - 12): 15", "2023-15-08", 0),
-//                logger.getLoggingEvents().getFirst().getThrowable().get());
+    private static Stream<Arguments> provideVolumeInfoArguments() {
+        return Stream.of(
+                Arguments.of(
+                        Map.of(
+                                "industryIdentifiers", List.of(
+                                        Map.of("type", "ISBN_10", "identifier","2"),
+                                        Map.of("type", "ISBN_13", "identifier","1")
+                                ),
+                                "title", "title",
+                                "publishedDate", "2023-11-08",
+                                "authors", List.of("author1", "author2"),
+                                "description", "description",
+                                "publisher", "publisher"
+                        ),
+                        new BookApiDto(
+                                1L, "title", "description", "author1, author2",
+                                "publisher", LocalDate.of(2023, 11, 8)
+                        )
+                )
+        );
     }
 
-    @Test
-    public void testCorrectedParsing() throws JsonProcessingException {
-        BookApiDto bookApiDto = new BookApiDto();
-        bookApiDto.unpackNested(Map.of("industryIdentifiers", List.of(Map.of("type", "ISBN_13","identifier","1")),
-                "title", "title",
-                "publishedDate", "2023-11-08",
-                "authors", List.of("author1, author2"),
-                "description", "description",
-                "publisher", "publisher1"));
-        Assertions.assertEquals("title", bookApiDto.getTitle());
-        Assertions.assertEquals("description", bookApiDto.getDescription());
-        Assertions.assertEquals("author1, author2", bookApiDto.getAuthors());
-        Assertions.assertEquals("publisher1", bookApiDto.getPublisher());
-        Assertions.assertEquals(bookApiDto.getPublishedDate(), LocalDate.of(2023, 11, 8));
-        Assertions.assertEquals(bookApiDto.getIsbn13(), Long.valueOf(1));
+    @ParameterizedTest
+    @MethodSource("provideVolumeInfoArguments")
+    void correctVolumeInfoTest(Map<String, Object> volumeInfo, BookApiDto expected) {
+        bookApiDto.unpackNested(volumeInfo);
+
+        assertInfo(expected.getIsbn13(), expected.getTitle(), expected.getDescription(), expected.getAuthors(),
+                expected.getPublisher(), expected.getPublishedDate());
+    }
+
+
+    private static Stream<Arguments> provideIncorrectIsbnInfoArguments() {
+        return Stream.of(
+                Arguments.of(
+                        Map.of(
+                                "industryIdentifiers", List.of(
+                                        Map.of("type", "ISBN_10", "identifier","1")
+                                ),
+                                "title", "title",
+                                "publishedDate", "2023-11-08",
+                                "authors", List.of("author1", "author2"),
+                                "description", "description",
+                                "publisher", "publisher"
+                        ),
+                        Map.of(
+                                "industryIdentifiers", List.of("1", "2"),
+                                "title", "title",
+                                "publishedDate", "2023-11-08",
+                                "authors", List.of("author1", "author2"),
+                                "description", "description",
+                                "publisher", "publisher"
+                        ),
+                        new BookApiDto()
+                ),
+                Arguments.of(
+                        Map.of(
+                                "title", "title",
+                                "publishedDate", "2023-11-08",
+                                "authors", List.of("author1", "author2"),
+                                "description", "description",
+                                "publisher", "publisher"
+                        ),
+                        new BookApiDto()
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideIncorrectIsbnInfoArguments")
+    public void testIncorrectIsbn(Map<String, Object> volumeInfo) {
+        bookApiDto.unpackNested(volumeInfo);
+
+        assertInfo(null, null, null, null, null, null);
+    }
+
+    private static Stream<Arguments> provideIncorrectVolumeInfo() {
+        return Stream.of(
+                Arguments.of(
+                        Map.of(
+                                "industryIdentifiers", List.of(
+                                        Map.of("type", "ISBN_13", "identifier","1")
+                                ),
+                                "title", List.of("title"),
+                                "publishedDate", "2023-11",
+                                "authors", "author1, author2",
+                                "description", 123,
+                                "publisher", Map.of("name", "publisher")
+                        )
+                ),
+                Arguments.of(
+                        Map.of(
+                                "industryIdentifiers", List.of(
+                                        Map.of("type", "ISBN_13", "identifier","1"),
+                                        Map.of("type", "ISBN_10", "identifier","2")
+                                )
+                        )
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideIncorrectVolumeInfo")
+    public void testIncorrectProperties(Map<String, Object> volumeInfo) {
+        bookApiDto.unpackNested(volumeInfo);
+
+        assertInfo(1L, null, null, null, null, null);
     }
 }

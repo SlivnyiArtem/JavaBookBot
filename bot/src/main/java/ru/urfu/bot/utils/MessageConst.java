@@ -37,4 +37,6 @@ public class MessageConst {
     public static final String INTERNAL_ERROR = "Внутренняя ошибка сервера";
 
     public static final String EMPTY_LIST = "Книги не найдены";
+
+    public static final String BOOK_NOT_FOUND = "Книга не найденна в коллекции пользователя";
 }

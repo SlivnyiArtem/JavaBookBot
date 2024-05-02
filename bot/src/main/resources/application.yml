@@ -34,12 +34,15 @@ spring:
 logging:
   level:
     org.hibernate: error
-    springframework.web: trace
+    org.springframework.web: debug
 
 spring:
   config:
     activate:
       on-profile: debug
+  output:
+    ansi:
+      enabled: ALWAYS
   h2:
     console:
       enabled: true

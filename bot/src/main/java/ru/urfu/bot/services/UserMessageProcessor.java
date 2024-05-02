@@ -21,23 +21,18 @@ public class UserMessageProcessor {
 
     private final Map<CommandType, CommandHandler> commands;
 
-    private final Map<CommandType, CommandHandler> callbacks;
-
     private final Parser parser;
 
     private final static Logger LOG = LoggerFactory.getLogger(UserMessageProcessor.class);
 
     /**
      * @param commandMap обработчики для команд
-     * @param callbacks обработчики коллэков
      * @param parser парсер команд
      */
     public UserMessageProcessor(
             @Qualifier(value = "commandMap") Map<CommandType, CommandHandler> commandMap,
-            @Qualifier(value = "callbackMap") Map<CommandType, CommandHandler> callbacks,
             Parser parser) {
         this.commands = commandMap;
-        this.callbacks = callbacks;
         this.parser = parser;
     }
 
@@ -57,18 +52,18 @@ public class UserMessageProcessor {
             String username = update.getMessage().getChat().getUserName();
             String chatId = update.getMessage().getChatId().toString();
 
-            addUserIfAbsent(commands, username, chatId);
+            addUserIfAbsent(username, chatId);
 
             return handler.handle(command, username, chatId);
         } else if (update.hasCallbackQuery()) {
             Command command = parser.parseCallback(update);
 
-            CommandHandler handler = callbacks.get(command.commandType());
+            CommandHandler handler = commands.get(command.commandType());
 
             String username = update.getCallbackQuery().getFrom().getUserName();
             String chatId = update.getCallbackQuery().getMessage().getChatId().toString();
 
-            addUserIfAbsent(callbacks, username, chatId);
+            addUserIfAbsent(username, chatId);
 
             return handler.handle(command, username, chatId);
         } else {
@@ -77,8 +72,8 @@ public class UserMessageProcessor {
         }
     }
 
-    private void addUserIfAbsent(Map<CommandType, CommandHandler> map, String username, String chatId) {
+    private void addUserIfAbsent(String username, String chatId) {
         Command startCommand = new Command(CommandType.START, "");
-        map.get(startCommand.commandType()).handle(startCommand, username, chatId);
+        commands.get(startCommand.commandType()).handle(startCommand, username, chatId);
     }
 }

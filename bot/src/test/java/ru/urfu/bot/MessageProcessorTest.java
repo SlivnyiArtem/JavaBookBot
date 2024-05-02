@@ -31,9 +31,6 @@ public class MessageProcessorTest {
     @Mock
     private Map<CommandType, CommandHandler> commandMap;
 
-    @Mock
-    private Map<CommandType, CommandHandler> callbackMap;
-
     private UserMessageProcessor userMessageProcessor;
 
     private Command command;
@@ -54,7 +51,7 @@ public class MessageProcessorTest {
     void init(){
         command = new Command(CommandType.UNKNOWN, "");
 
-        userMessageProcessor = new UserMessageProcessor(commandMap, callbackMap, parser);
+        userMessageProcessor = new UserMessageProcessor(commandMap, parser);
     }
 
     @Test
@@ -92,8 +89,8 @@ public class MessageProcessorTest {
 
         when(callbackHandler.handle(eq(command), eq(username), eq(Long.toString(chatId))))
                 .thenReturn(List.of(new SendMessage()));
-        when(callbackMap.get(eq(CommandType.UNKNOWN))).thenReturn(callbackHandler);
-        when(callbackMap.get(eq(CommandType.START))).thenReturn(mock(CommandHandler.class));
+        when(commandMap.get(eq(CommandType.UNKNOWN))).thenReturn(callbackHandler);
+        when(commandMap.get(eq(CommandType.START))).thenReturn(mock(CommandHandler.class));
 
         // Act
         List<SendMessage> actual_msg = userMessageProcessor.process(update);

@@ -1,12 +1,6 @@
 package ru.urfu.bot.db.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
-
+import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -29,6 +23,9 @@ public class Book {
 
     public void setDescription(String description) {
         try {
+            if (description == null) {
+                return;
+            }
             int size = 255;
             int inLength = description.length();
             if (inLength>size)
