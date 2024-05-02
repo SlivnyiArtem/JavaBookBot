@@ -104,7 +104,7 @@ public class BookApiDto {
                             .map(obj -> (Map<?,?>) obj)
                             .filter(map -> Objects.equals(map.get("type"), "ISBN_13"))
                             .findFirst()
-                            .orElseThrow()
+                            .orElseThrow(NoSuchElementException::new)
                             .get("identifier")
             );
         } catch (ClassCastException | NoSuchElementException e) {
