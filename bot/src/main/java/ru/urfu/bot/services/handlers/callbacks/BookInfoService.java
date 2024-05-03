@@ -42,8 +42,8 @@ public class BookInfoService implements CommandHandler {
             );
             return List.of(new SendMessage(chatId, message));
         } catch (BookNotFoundException e) {
-            LOG.error("book isbn not found in db", e);
-            return List.of(new SendMessage(chatId, MessageConst.INTERNAL_ERROR));
+            LOG.warn("book isbn not found in db", e);
+            return List.of(new SendMessage(chatId, MessageConst.BOOK_NOT_FOUND));
         }
     }
 }

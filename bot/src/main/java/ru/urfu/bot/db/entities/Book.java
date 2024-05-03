@@ -23,6 +23,9 @@ public class Book {
 
     public void setDescription(String description) {
         try {
+            if (description == null) {
+                return;
+            }
             int size = 255;
             int inLength = description.length();
             if (inLength>size)

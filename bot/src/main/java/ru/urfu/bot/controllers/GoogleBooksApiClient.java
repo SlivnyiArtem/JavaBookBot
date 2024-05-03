@@ -1,10 +1,13 @@
 package ru.urfu.bot.controllers;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 import ru.urfu.bot.config.BotProperties;
 import ru.urfu.bot.db.entities.Book;
+import ru.urfu.bot.db.exceptions.BookNotFoundException;
 import ru.urfu.bot.utils.dto.BookApiDto;
 import ru.urfu.bot.utils.dto.BookListApiDto;
 
@@ -35,16 +38,19 @@ public class GoogleBooksApiClient {
         BookListApiDto bookListApiDto = webClient.get()
                 .uri("/volumes?q={name}", name)
                 .retrieve()
+                .onStatus(HttpStatusCode::isError, response -> Mono.empty())
                 .bodyToMono(BookListApiDto.class)
                 .block();
 
-        if (bookListApiDto.getTotalItems() == 0) {
+        if (bookListApiDto == null || bookListApiDto.getTotalItems() == 0) {
             return List.of();
         }
         return bookListApiDto
                 .getItems()
                 .stream()
                 .filter(bookApiDto -> bookApiDto.getIsbn13() != null)
+                // этот фильтр замедляет вывод; нужен потому, что некоторые книги нельзя найти по isbn
+                .filter(bookApiDto -> findBookByIsbn(bookApiDto.getIsbn13()).isPresent())
                 .map(bookApiDto -> modelMapper.map(bookApiDto, Book.class))
                 .limit(5)
                 .toList();
@@ -57,17 +63,18 @@ public class GoogleBooksApiClient {
         BookListApiDto bookListApiDto = webClient.get()
                 .uri("/volumes?q=isbn:{isbn}", isbn)
                 .retrieve()
+                .onStatus(HttpStatusCode::isError, response -> Mono.empty())
                 .bodyToMono(BookListApiDto.class)
                 .block();
 
-        if (bookListApiDto.getTotalItems() == 0) {
+        if (bookListApiDto == null || bookListApiDto.getTotalItems() == 0) {
             return Optional.empty();
         }
         BookApiDto bookApiDto = bookListApiDto.getItems()
                 .stream()
                 .filter(bookApiDto1 -> bookApiDto1.getIsbn13() != null)
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(BookNotFoundException::new);
         return Optional.of(modelMapper.map(bookApiDto, Book.class));
     }
 }

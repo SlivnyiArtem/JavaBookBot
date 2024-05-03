@@ -56,8 +56,8 @@ public class RemoveBookService implements CommandHandler {
 
             return List.of(new SendMessage(chatId, MessageConst.REMOVE_BOOK));
         } catch (BookNotFoundException e) {
-            LOG.error("book isbn not found in db", e);
-            return List.of(new SendMessage(chatId, MessageConst.INTERNAL_ERROR));
+            LOG.warn("book isbn not found in db", e);
+            return List.of(new SendMessage(chatId, MessageConst.BOOK_NOT_FOUND));
         } catch (UserNotFoundException e) {
             LOG.error("user not found");
             return List.of(new SendMessage(chatId, MessageConst.INTERNAL_ERROR));
