@@ -93,48 +93,51 @@ public class BookApiDto {
     public void unpackNested(Map<String,Object> volumeInfo) {
 
         try {
-            List<?> identifiers = Optional.of((List<?>) Optional.of(volumeInfo.get("industryIdentifiers"))
+            List<?> identifiers = Optional.ofNullable( Optional.ofNullable(volumeInfo.get("industryIdentifiers"))
                             .orElseThrow(() -> new DtoCustomNoSuchElementExc(null, BookDtoFieldEnum.IDENTIFIER)))
+                    .filter(List.class::isInstance)
+                    .map(List.class::cast)
                     .orElseThrow(() -> new DtoCastCustomExc(null, BookDtoFieldEnum.IDENTIFIER));
 
-            this.isbn13 = Long.parseLong(Optional.of((String) identifiers.stream()
+            this.isbn13 = Long.parseLong(Optional.of( identifiers.stream()
                     .map(obj -> (Map<?,?>) obj)
                     .filter(map -> Objects.equals(map.get("type"), "ISBN_13"))
                     .findFirst()
                     .orElseThrow(() -> new DtoCustomNoSuchElementExc(null, BookDtoFieldEnum.IDENTIFIER))
-                    .get("identifier")).orElseThrow(() -> new DtoCastCustomExc(null, BookDtoFieldEnum.IDENTIFIER)));
+                    .get("identifier"))
+                    .filter(String.class::isInstance).map(String.class::cast)
+                    .orElseThrow(() -> new DtoCastCustomExc(null, BookDtoFieldEnum.IDENTIFIER)));
 
-            this.title = Optional.of((String) Optional.of(volumeInfo.get("title"))
+            this.title = Optional.of(Optional.ofNullable(volumeInfo.get("title"))
                             .orElseThrow(() -> new DtoCustomNoSuchElementExc(null, BookDtoFieldEnum.TITLE)))
+                    .filter(String.class::isInstance).map(String.class::cast)
                     .orElseThrow(() -> new DtoCastCustomExc(null, BookDtoFieldEnum.TITLE));
 
-            this.description = Optional.of((String) Optional.of(volumeInfo.get("description"))
+            this.description = Optional.of(Optional.ofNullable(volumeInfo.get("description"))
                     .orElseThrow(() -> new DtoCustomNoSuchElementExc(null, BookDtoFieldEnum.DESC)))
+                    .filter(String.class::isInstance).map(String.class::cast)
                     .orElseThrow(() -> new DtoCastCustomExc(null, BookDtoFieldEnum.DESC));
-            List<?> authorsList = Optional.of((List<?>) Optional.of(volumeInfo.get("authors"))
+
+            List<?> authorsList = Optional.of( Optional.ofNullable(volumeInfo.get("authors"))
                     .orElseThrow(() -> new DtoCustomNoSuchElementExc(null, BookDtoFieldEnum.AUTHORS)))
+                    .filter(List.class::isInstance).map(List.class::cast)
                     .orElseThrow(() -> new DtoCastCustomExc(null, BookDtoFieldEnum.AUTHORS));
+
             this.authors = authorsList.stream()
-                    .map(obj -> Optional.of((String) obj)
+                    .map(obj -> Optional.of(obj)
+                            .filter(String.class::isInstance).map(String.class::cast)
                     .orElseThrow(() -> new DtoCastCustomExc(null, BookDtoFieldEnum.AUTHORS)))
                     .collect(Collectors.joining(", "));
-            this.publisher = Optional.of((String) Optional.of(volumeInfo.get("publisher"))
+
+            this.publisher = Optional.of(Optional.ofNullable(volumeInfo.get("publisher"))
                     .orElseThrow(() -> new DtoCustomNoSuchElementExc(null, BookDtoFieldEnum.PUBLISHER)))
+                    .filter(String.class::isInstance).map(String.class::cast)
                     .orElseThrow(() -> new DtoCastCustomExc(null, BookDtoFieldEnum.PUBLISHER));
-            this.publishedDate = LocalDate.parse(Optional.of((String) Optional.of(volumeInfo.get("publishedDate"))
+            
+            this.publishedDate = LocalDate.parse(Optional.of(Optional.ofNullable(volumeInfo.get("publishedDate"))
                     .orElseThrow(() -> new DtoCustomNoSuchElementExc(null, BookDtoFieldEnum.PBDATE)))
+                    .filter(String.class::isInstance).map(String.class::cast)
                     .orElseThrow(() -> new DtoCastCustomExc(null, BookDtoFieldEnum.PBDATE)));
-
-
-//            List<?> identifiers = Optional.ofNullable((List<?>) volumeInfo.get("industryIdentifiers").)
-//                    .orElseThrow(() -> new DtoCustomNoSuchElementExc(null, BookDtoFieldEnum.IDENTIFIER));
-//            this.isbn13 = Long.parseLong(Optional.of((String) identifiers.stream()
-//                    .map(obj -> (Map<?,?>) obj)
-//                    .filter(map -> Objects.equals(map.get("type"), "ISBN_13"))
-//                    .findFirst()
-//                    .orElseThrow(() -> new DtoCustomNoSuchElementExc(null, BookDtoFieldEnum.IDENTIFIER))
-//                    .get("identifier")).orElseThrow(() -> new DtoCastCustomExc(null, BookDtoFieldEnum.IDENTIFIER)));
-//            this.title = Optional.of((String) volumeInfo.get("title"))
         }catch (DtoCastCustomExc exc) {
             LOG.warn(String.format("can't parse %s", exc.getField()), exc);
         }catch (DtoCustomNoSuchElementExc exc) {
@@ -142,73 +145,5 @@ public class BookApiDto {
         }catch (DateTimeParseException exc){
             LOG.warn("can't parse published date", exc);
         }
-
-
-//        try {
-//            if (volumeInfo.get("industryIdentifiers") == null) {
-//                throw new NoSuchElementException();
-//            }
-//            List<?> identifiers = (List<?>) volumeInfo.get("industryIdentifiers");
-//            this.isbn13 = Long.parseLong(
-//                    (String) identifiers.stream()
-//                            .map(obj -> (Map<?,?>) obj)
-//                            .filter(map -> Objects.equals(map.get("type"), "ISBN_13"))
-//                            .findFirst()
-//                            .orElseThrow(NoSuchElementException::new)
-//                            .get("identifier")
-//            );
-//        } catch (ClassCastException | NoSuchElementException e) {
-//            LOG.warn("can't parse identifier", e);
-//            // Если нет идентификатора, значит объект не годен
-//            return;
-//        }
-//
-//        try {
-//            if (volumeInfo.get("title") == null) {
-//                throw new NoSuchElementException();
-//            }
-//            this.title = (String) volumeInfo.get("title");
-//        } catch (ClassCastException | NoSuchElementException e) {
-//            LOG.warn("can't parse title", e);
-//        }
-//
-//        try {
-//            if (volumeInfo.get("description") == null) {
-//                throw new NoSuchElementException();
-//            }
-//            this.description = (String) volumeInfo.get("description");
-//        } catch (ClassCastException | NoSuchElementException e) {
-//            LOG.warn("can't parse description", e);
-//        }
-//
-//        try {
-//            if (volumeInfo.get("authors") == null) {
-//                throw new NoSuchElementException();
-//            }
-//            List<?> authorsList = (List<?>) volumeInfo.get("authors");
-//            this.authors = authorsList.stream()
-//                    .map(obj -> (String) obj)
-//                    .collect(Collectors.joining(", "));
-//        } catch (ClassCastException | NoSuchElementException e) {
-//            LOG.warn("can't parse authors list", e);
-//        }
-//
-//        try {
-//            if (volumeInfo.get("publisher") == null) {
-//                throw new NoSuchElementException();
-//            }
-//            this.publisher = (String) volumeInfo.get("publisher");
-//        } catch (ClassCastException | NoSuchElementException e) {
-//            LOG.warn("can't parse publisher", e);
-//        }
-//
-//        try {
-//            if (volumeInfo.get("publishedDate") == null) {
-//                throw new NoSuchElementException();
-//            }
-//            this.publishedDate = LocalDate.parse((String) volumeInfo.get("publishedDate"));
-//        } catch (ClassCastException | NoSuchElementException | DateTimeParseException e) {
-//            LOG.warn("can't parse published date", e);
-//        }
     }
 }
