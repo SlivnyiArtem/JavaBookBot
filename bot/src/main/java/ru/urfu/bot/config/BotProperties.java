@@ -5,6 +5,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotEmpty;
+import java.time.Duration;
 
 /**
  * Устанавливает переменные для приложения
@@ -14,7 +15,7 @@ import javax.validation.constraints.NotEmpty;
  * @param bookApiBaseUrl - url для общения с api
  */
 @Validated
-@ConfigurationProperties(prefix = "app", ignoreUnknownFields = false)
+@ConfigurationProperties(value = "app", ignoreUnknownFields = false)
 @PropertySource("classpath:application.yml")
 public record BotProperties(
         @NotEmpty
@@ -24,6 +25,8 @@ public record BotProperties(
         @NotEmpty
         String apiKey,
         @NotEmpty
-        String bookApiBaseUrl
+        String bookApiBaseUrl,
+        @NotEmpty
+        Duration updateInfoDelay
 ) {
 }

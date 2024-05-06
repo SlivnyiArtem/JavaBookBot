@@ -39,4 +39,8 @@ public class MessageConst {
     public static final String EMPTY_LIST = "Книги не найдены";
 
     public static final String BOOK_NOT_FOUND = "Книга не найденна в коллекции пользователя";
+
+    public static final String BOOK_RELEASE = "Книга %s (isbn: %d) вышла";
+
+    public static final String BOOK_UPDATE_INFO = "Информация о книге %s (isbn: %d) обновленна";
 }

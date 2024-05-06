@@ -12,6 +12,7 @@ app:
   telegram-bot-name: book_tracker_bot
   api-key: ${API_KEY}
   book-api-base-url: https://www.googleapis.com/books/v1
+  update-info-delay: 5d    # кол-во дней
 
 ---
 

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -85,6 +86,19 @@ public class Book {
     private String publisher;
 
     private LocalDate publishedDate;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Book book = (Book) o;
+        return Objects.equals(isbn13, book.isbn13) && Objects.equals(title, book.title) && Objects.equals(description, book.description) && Objects.equals(authors, book.authors) && Objects.equals(publisher, book.publisher) && Objects.equals(publishedDate, book.publishedDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(isbn13, title, description, authors, publisher, publishedDate);
+    }
 
     @ManyToMany
     @JoinTable(
