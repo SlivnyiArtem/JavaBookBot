@@ -38,6 +38,7 @@ public class ApplicationConfig {
                 CommandType.START, context.getBean(StartBotService.class),
                 CommandType.SEARCH, context.getBean(SearchBookService.class),
                 CommandType.PRINT, context.getBean(PrintBooksService.class),
+                CommandType.SET_TIME, context.getBean(SetNotifyTimeService.class),
                 CommandType.HELP, context.getBean(HelpBotService.class),
                 CommandType.ADD, context.getBean(AddBookService.class),
                 CommandType.INFO, context.getBean(BookInfoService.class),

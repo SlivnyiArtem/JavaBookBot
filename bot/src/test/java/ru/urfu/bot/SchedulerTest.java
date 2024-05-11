@@ -3,21 +3,23 @@ package ru.urfu.bot;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import ru.urfu.bot.bot.Bot;
 import ru.urfu.bot.controllers.GoogleBooksApiClient;
 import ru.urfu.bot.db.entities.Book;
 import ru.urfu.bot.db.entities.Chat;
 import ru.urfu.bot.db.entities.User;
 import ru.urfu.bot.db.repositories.JpaBookRepository;
+import ru.urfu.bot.services.QueueProvider;
 import ru.urfu.bot.services.SchedulerService;
 
 import java.time.LocalDate;
+import java.time.OffsetTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,11 +34,14 @@ public class SchedulerTest {
     @Mock
     private JpaBookRepository bookRepository;
 
-    @Mock
-    private Bot bot;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private QueueProvider queueProvider;
 
     @InjectMocks
     private SchedulerService schedulerService;
+
+    private final OffsetTime scheduledTime =
+            OffsetTime.of(10, 0, 0, 0, ZoneOffset.ofHours(0));
 
     @BeforeEach
     public void init() {
@@ -46,6 +51,7 @@ public class SchedulerTest {
 
         User user1 = new User("user1");
         User user2 = new User("user2");
+        user1.setScheduledTime(scheduledTime);
 
         user1.getChats().add(chat1);
         user1.getChats().add(chat2);
@@ -89,20 +95,23 @@ public class SchedulerTest {
      * </ol>
      */
     @Test
-    public void checkReleaseTest() throws TelegramApiException {
+    public void checkReleaseTest() throws InterruptedException {
         LocalDate now = LocalDate.of(2000, 1, 2);
 
         try (MockedStatic<LocalDate> localDate =  mockStatic(LocalDate.class)) {
+            localDate
+                    .when(() -> LocalDate.now(eq(scheduledTime.getOffset())))
+                    .thenReturn(now);
             localDate
                     .when(LocalDate::now)
                     .thenReturn(now);
 
             schedulerService.checkReleaseDate();
-            verify(bot, times(4)).execute(any(SendMessage.class));
-            verify(bot).execute(eq(new SendMessage("1", "Книга book1 (isbn: 1) вышла")));
-            verify(bot).execute(eq(new SendMessage("2", "Книга book1 (isbn: 1) вышла")));
-            verify(bot).execute(eq(new SendMessage("3", "Книга book1 (isbn: 1) вышла")));
-            verify(bot).execute(eq(new SendMessage("3", "Книга book2 (isbn: 2) вышла")));
+            verify(queueProvider.getSendQueue()).put(eq(new SendMessage("1", "Книга book1 (isbn: 1) вышла")));
+            verify(queueProvider.getSendQueue()).put(eq(new SendMessage("2", "Книга book1 (isbn: 1) вышла")));
+            verify(queueProvider.getSendQueue()).put(eq(new SendMessage("3", "Книга book1 (isbn: 1) вышла")));
+            verify(queueProvider.getSendQueue()).put(eq(new SendMessage("3", "Книга book2 (isbn: 2) вышла")));
+            verifyNoMoreInteractions(queueProvider.getSendQueue());
         }
     }
 
@@ -120,7 +129,7 @@ public class SchedulerTest {
      * </ol>
      */
     @Test
-    public void checkInfoTest() throws TelegramApiException {
+    public void checkInfoTest() throws InterruptedException {
         Book book1 = new Book();
         book1.setIsbn13(1L);
 
@@ -138,9 +147,9 @@ public class SchedulerTest {
         schedulerService.checkUpdateInfo();
 
         verify(bookRepository, times(1)).save(any());
-        verify(bot, times(3)).execute(any(SendMessage.class));
-        verify(bot).execute(eq(new SendMessage("1", "Информация о книге book1 (isbn: 1) обновленна")));
-        verify(bot).execute(eq(new SendMessage("2", "Информация о книге book1 (isbn: 1) обновленна")));
-        verify(bot).execute(eq(new SendMessage("3", "Информация о книге book1 (isbn: 1) обновленна")));
+        verify(queueProvider.getSendQueue()).put(eq(new SendMessage("1", "Информация о книге book1 (isbn: 1) обновленна")));
+        verify(queueProvider.getSendQueue()).put(eq(new SendMessage("2", "Информация о книге book1 (isbn: 1) обновленна")));
+        verify(queueProvider.getSendQueue()).put(eq(new SendMessage("3", "Информация о книге book1 (isbn: 1) обновленна")));
+        verifyNoMoreInteractions(queueProvider.getSendQueue());
     }
 }

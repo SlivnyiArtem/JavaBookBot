@@ -63,7 +63,6 @@ public class AddBookServiceTest {
 
         // Assert
         verify(user.getBooks()).add(book);
-        verify(userRepository).save(user);
         verify(bookRepository).save(book);
     }
 
@@ -81,7 +80,6 @@ public class AddBookServiceTest {
 
         // Assert
         verify(user.getBooks()).add(book);
-        verify(userRepository).save(user);
         verify(bookRepository).save(book);
     }
 

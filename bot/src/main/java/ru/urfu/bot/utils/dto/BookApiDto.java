@@ -108,7 +108,7 @@ public class BookApiDto {
                             .get("identifier")
             );
         } catch (ClassCastException | NoSuchElementException e) {
-            LOG.warn("can't parse identifier", e);
+            LOG.warn("can't parse identifier");
             // Если нет идентификатора, значит объект не годен
             return;
         }
@@ -119,7 +119,7 @@ public class BookApiDto {
             }
             this.title = (String) volumeInfo.get("title");
         } catch (ClassCastException | NoSuchElementException e) {
-            LOG.warn("can't parse title", e);
+            LOG.warn("can't parse title");
         }
 
         try {
@@ -128,7 +128,7 @@ public class BookApiDto {
             }
             this.description = (String) volumeInfo.get("description");
         } catch (ClassCastException | NoSuchElementException e) {
-            LOG.warn("can't parse description", e);
+            LOG.warn("can't parse description");
         }
 
         try {
@@ -140,7 +140,7 @@ public class BookApiDto {
                     .map(obj -> (String) obj)
                     .collect(Collectors.joining(", "));
         } catch (ClassCastException | NoSuchElementException e) {
-            LOG.warn("can't parse authors list", e);
+            LOG.warn("can't parse authors list");
         }
 
         try {
@@ -149,7 +149,7 @@ public class BookApiDto {
             }
             this.publisher = (String) volumeInfo.get("publisher");
         } catch (ClassCastException | NoSuchElementException e) {
-            LOG.warn("can't parse publisher", e);
+            LOG.warn("can't parse publisher");
         }
 
         try {
@@ -158,7 +158,7 @@ public class BookApiDto {
             }
             this.publishedDate = LocalDate.parse((String) volumeInfo.get("publishedDate"));
         } catch (ClassCastException | NoSuchElementException | DateTimeParseException e) {
-            LOG.warn("can't parse published date", e);
+            LOG.warn("can't parse published date");
         }
     }
 }

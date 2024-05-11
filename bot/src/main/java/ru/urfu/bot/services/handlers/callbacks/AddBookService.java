@@ -55,7 +55,6 @@ public class AddBookService implements CommandHandler {
             book.getUsers().add(user);
 
             bookRepository.save(book);
-            userRepository.save(user);
             return List.of(new SendMessage(chatId, MessageConst.ADD_BOOK));
         } catch (BookNotFoundException e) {
             LOG.error("book isbn not found in db and source", e);

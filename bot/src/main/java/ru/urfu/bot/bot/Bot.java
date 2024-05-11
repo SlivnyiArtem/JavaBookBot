@@ -1,15 +1,16 @@
 package ru.urfu.bot.bot;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.urfu.bot.config.BotProperties;
-import ru.urfu.bot.services.UserMessageProcessor;
+import ru.urfu.bot.services.QueueProvider;
 
-import java.util.List;
+import java.util.concurrent.BlockingQueue;
 
 
 /**
@@ -18,10 +19,11 @@ import java.util.List;
 @Component
 public class Bot extends TelegramLongPollingBot {
 
+    private final static Logger LOG = LoggerFactory.getLogger(Bot.class);
+
     private final String userName;
 
-    private final UserMessageProcessor userMessageProcessor;
-
+    private final BlockingQueue<Update> receiveQueue;
 
     /**
      * Конфигурирует и запускает бота
@@ -29,11 +31,11 @@ public class Bot extends TelegramLongPollingBot {
     public Bot(
             TelegramBotsApi telegramBotsApi,
             BotProperties properties,
-            UserMessageProcessor userMessageProcessor) throws TelegramApiException {
+            QueueProvider queueProvider) throws TelegramApiException {
 
         super(properties.telegramToken());
         this.userName = properties.telegramBotName();
-        this.userMessageProcessor = userMessageProcessor;
+        this.receiveQueue = queueProvider.getReceiveQueue();
         telegramBotsApi.registerBot(this);
     }
 
@@ -42,14 +44,11 @@ public class Bot extends TelegramLongPollingBot {
      */
     @Override
     public void onUpdateReceived(Update update) {
-        List<SendMessage> response = userMessageProcessor.process(update);
-        response.forEach(message -> {
-            try {
-                execute(message);
-            } catch (TelegramApiException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        try {
+            receiveQueue.put(update);
+        } catch (InterruptedException e) {
+            LOG.error(e.getMessage());
+        }
     }
 
     @Override

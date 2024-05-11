@@ -3,6 +3,10 @@ spring:
     active: debug    # поменять чтобы сменить профиль
   application:
     name: bot
+  task:
+    scheduling:
+      pool:
+        size: 100    # кол-во доступных потоков
 
 server:
   port: 8080
@@ -12,7 +16,10 @@ app:
   telegram-bot-name: book_tracker_bot
   api-key: ${API_KEY}
   book-api-base-url: https://www.googleapis.com/books/v1
-  update-info-delay: 5d    # кол-во дней
+  update-info-delay: 5d    # частота проверки обновлений информации в бд
+
+logging:
+  config: classpath:log4j2-plain.xml
 
 ---
 
@@ -32,18 +39,10 @@ spring:
 
 ---
 
-logging:
-  level:
-    org.hibernate: error
-    org.springframework.web: debug
-
 spring:
   config:
     activate:
       on-profile: debug
-  output:
-    ansi:
-      enabled: ALWAYS
   h2:
     console:
       enabled: true

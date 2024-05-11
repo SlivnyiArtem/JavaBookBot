@@ -3,6 +3,7 @@ package ru.urfu.bot.services;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -12,37 +13,52 @@ import ru.urfu.bot.utils.dto.CommandType;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
 
 /**
- * Сервис для определения и выполнения команд.
+ * Сервис для определения и выполнения комманд.
  */
 @Service
-public class UserMessageProcessor {
+public class MessageProcessor {
 
     private final Map<CommandType, CommandHandler> commands;
 
     private final Parser parser;
 
-    private final static Logger LOG = LoggerFactory.getLogger(UserMessageProcessor.class);
+    private final static Logger LOG = LoggerFactory.getLogger(MessageProcessor.class);
+
+    private final BlockingQueue<Update> receiveQueue;
+
+    private final BlockingQueue<SendMessage> sendQueue;
 
     /**
      * @param commandMap обработчики для команд
      * @param parser парсер команд
+     * @param queueProvider предоставляет очереди сообщений
      */
-    public UserMessageProcessor(
+    public MessageProcessor(
             @Qualifier(value = "commandMap") Map<CommandType, CommandHandler> commandMap,
-            Parser parser) {
+            Parser parser, QueueProvider queueProvider) {
         this.commands = commandMap;
         this.parser = parser;
+        this.receiveQueue = queueProvider.getReceiveQueue();
+        this.sendQueue = queueProvider.getSendQueue();
     }
 
-    // TODO fix dependency; fix search command bugs
     /**
-     * Парсит обновление и формирует ответ для пользователя.
-     * @param update входящее сообщение
-     * @return список сформированных ответных сообщений
+     * Обрабатывает обновления из очереди на обработку. Подготавливает ответ и
+     * отправляет в очередь на отправку.
      */
-    public List<SendMessage> process(Update update) {
+    @Scheduled(fixedRate = 500)
+    public void processUpdate() {
+        Update update;
+        try {
+            update = receiveQueue.take();
+        } catch (InterruptedException e) {
+            LOG.error(e.getMessage());
+            return;
+        }
+        LOG.trace("process update #{}", update.getUpdateId());
 
         if (update.hasMessage() && update.getMessage().hasText()) {
             Command command = parser.parseCommand(update);
@@ -53,8 +69,7 @@ public class UserMessageProcessor {
             String chatId = update.getMessage().getChatId().toString();
 
             addUserIfAbsent(username, chatId);
-
-            return handler.handle(command, username, chatId);
+            executeMessages(handler.handle(command, username, chatId));
         } else if (update.hasCallbackQuery()) {
             Command command = parser.parseCallback(update);
 
@@ -64,16 +79,24 @@ public class UserMessageProcessor {
             String chatId = update.getCallbackQuery().getMessage().getChatId().toString();
 
             addUserIfAbsent(username, chatId);
-
-            return handler.handle(command, username, chatId);
+            executeMessages(handler.handle(command, username, chatId));
         } else {
             LOG.error("don't supported update received");
-            return List.of();
         }
+    }
+
+    private void executeMessages(List<SendMessage> sendMessages) {
+        sendMessages.forEach(sendMessage -> {
+            try {
+                sendQueue.put(sendMessage);
+            } catch (InterruptedException e) {
+                LOG.error(e.getMessage());
+            }
+        });
     }
 
     private void addUserIfAbsent(String username, String chatId) {
         Command startCommand = new Command(CommandType.START, "");
-        commands.get(startCommand.commandType()).handle(startCommand, username, chatId);
+        executeMessages(commands.get(startCommand.commandType()).handle(startCommand, username, chatId));
     }
 }
