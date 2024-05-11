@@ -42,7 +42,7 @@ public class MessageProcessorTest {
     @InjectMocks
     private MessageProcessor messageProcessor;
 
-    private final Command command = new Command(CommandType.UNKNOWN, "");;
+    private final Command command = new Command(CommandType.UNKNOWN, "");
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private Update update;

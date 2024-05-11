@@ -97,6 +97,6 @@ public class MessageProcessor {
 
     private void addUserIfAbsent(String username, String chatId) {
         Command startCommand = new Command(CommandType.START, "");
-        executeMessages(commands.get(startCommand.commandType()).handle(startCommand, username, chatId));
+        commands.get(startCommand.commandType()).handle(startCommand, username, chatId);
     }
 }
