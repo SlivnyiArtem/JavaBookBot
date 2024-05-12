@@ -111,4 +111,8 @@ public class Book {
     public Set<User> getUsers() {
         return users;
     }
+
+    public boolean addUser(User user){
+        return users.add(user);
+    }
 }

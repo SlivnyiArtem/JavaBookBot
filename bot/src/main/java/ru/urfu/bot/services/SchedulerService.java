@@ -83,9 +83,9 @@ public class SchedulerService {
         LOG.trace("check if book info updated");
         bookRepository.findAll().stream()
                 .filter(book -> {
-                    Optional<Book> book1 = booksApiClient.findBookByIsbn(book.getIsbn13());
-                    if (book1.isPresent() && !book1.get().equals(book)) {
-                        bookRepository.save(book1.get());
+                    Optional<Book> apiBook = booksApiClient.findBookByIsbn(book.getIsbn13());
+                    if (apiBook.isPresent() && !apiBook.get().equals(book)) {
+                        bookRepository.save(apiBook.get());
                         return true;
                     }
                     return false;
