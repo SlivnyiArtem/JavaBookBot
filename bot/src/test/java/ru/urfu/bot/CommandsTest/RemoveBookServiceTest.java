@@ -58,7 +58,7 @@ public class RemoveBookServiceTest {
         removeBookService.handle(command, username, chatId);
 
         // Assert
-        verify(user.getBooks()).remove(book);
+        verify(user).removeBook(book);
         verify(bookRepository).delete(book);
     }
 

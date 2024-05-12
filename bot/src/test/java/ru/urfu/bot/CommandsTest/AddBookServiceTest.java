@@ -62,7 +62,7 @@ public class AddBookServiceTest {
         addBookService.handle(command, username, chatId);
 
         // Assert
-        verify(user.getBooks()).add(book);
+        verify(user).addBook(book);
         verify(bookRepository).save(book);
     }
 
@@ -79,7 +79,7 @@ public class AddBookServiceTest {
         addBookService.handle(command, username, chatId);
 
         // Assert
-        verify(user.getBooks()).add(book);
+        verify(user).addBook(book);
         verify(bookRepository).save(book);
     }
 

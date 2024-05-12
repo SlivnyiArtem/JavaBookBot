@@ -51,8 +51,8 @@ public class AddBookService implements CommandHandler {
                     .orElseThrow(BookNotFoundException::new);
             User user = userRepository.findByUserName(username).orElseThrow(UserNotFoundException::new);
 
-            user.getBooks().add(book);
-            book.getUsers().add(user);
+            user.addBook(book);
+            book.addUser(user);
 
             bookRepository.save(book);
             return List.of(new SendMessage(chatId, MessageConst.ADD_BOOK));

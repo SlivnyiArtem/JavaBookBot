@@ -44,8 +44,8 @@ public class RemoveBookService implements CommandHandler {
             Book book = bookRepository.findByIsbn13AndUsers_UserName(isbn, username)
                     .orElseThrow(BookNotFoundException::new);
 
-            book.getUsers().remove(user);
-            user.getBooks().remove(book);
+            book.removeUser(user);
+            user.removeBook(book);
 
             if (book.getUsers().isEmpty()) {
                 bookRepository.delete(book);

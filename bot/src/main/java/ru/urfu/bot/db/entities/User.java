@@ -36,6 +36,9 @@ public class User {
         return books;
     }
 
+    public void addBook(Book book){books.add(book);}
+    public void removeBook(Book book){books.remove(book);}
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;

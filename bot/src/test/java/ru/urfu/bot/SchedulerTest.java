@@ -79,12 +79,12 @@ public class SchedulerTest {
         book5.setIsbn13(5L);
         book5.setTitle("book5");
 
-        book1.getUsers().add(user1);
-        book1.getUsers().add(user2);
-        book2.getUsers().add(user1);
-        book2.getUsers().add(user2);
-        book4.getUsers().add(user2);
-        book5.getUsers().add(user2);
+        book1.addUser(user1);
+        book1.addUser(user2);
+        book2.addUser(user1);
+        book2.addUser(user2);
+        book4.addUser(user2);
+        book5.addUser(user2);
 
         when(bookRepository.findAll()).thenReturn(List.of(book1, book2, book3, book4, book5));
     }
