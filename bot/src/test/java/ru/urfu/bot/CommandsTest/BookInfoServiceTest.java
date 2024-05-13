@@ -85,7 +85,7 @@ public class BookInfoServiceTest {
 
         Command command = new Command(CommandType.INFO, Long.toString(isbn));
         SendMessage expected = SendMessage.builder()
-                .chatId(chatId).text(MessageConst.INTERNAL_ERROR)
+                .chatId(chatId).text("Книга не найденна в коллекции пользователя")
                 .build();
 
         // Act
@@ -106,7 +106,7 @@ public class BookInfoServiceTest {
 
         Command command = new Command(CommandType.INFO, Long.toString(isbn));
         SendMessage expected = SendMessage.builder()
-                .chatId(chatId).text(MessageConst.INTERNAL_ERROR)
+                .chatId(chatId).text("Книга не найденна в коллекции пользователя")
                 .build();
 
         // Act
