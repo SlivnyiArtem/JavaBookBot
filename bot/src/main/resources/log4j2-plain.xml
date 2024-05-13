@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <Console name="STDOUT_PLAIN" target="SYSTEM_OUT">
+            <PatternLayout
+                    disableAnsi="false"
+                    pattern="%d{HH:mm:ss.SSS} %highlight{%-5p}{FATAL=red blink, ERROR=red, WARN=yellow bold, INFO=green, DEBUG=green bold, TRACE=blue} [%-30.80thread] %style{%X} %-25.25logger{20} -- %highlight{%m}{FATAL=red blink, ERROR=red, WARN=yellow bold, INFO=green, DEBUG=green bold, TRACE=blue} %n"
+            />
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="org.springframework.web" level="TRACE"/>
+        <Logger name="org.hibernate" level="WARN"/>
+        <Logger name="org.telegram.telegrambots" level="TRACE"/>
+        <Logger name="ru.urfu.bot" level="TRACE"/>
+
+        <Root level="INFO">
+            <AppenderRef ref="STDOUT_PLAIN"/>
+        </Root>
+    </Loggers>
+
+</Configuration>

@@ -49,17 +49,13 @@ public class RemoveBookService implements CommandHandler {
 
             if (book.getUsers().isEmpty()) {
                 bookRepository.delete(book);
-            } else {
-                bookRepository.save(book);
             }
-            userRepository.save(user);
-
             return List.of(new SendMessage(chatId, MessageConst.REMOVE_BOOK));
         } catch (BookNotFoundException e) {
             LOG.warn("book isbn not found in db", e);
             return List.of(new SendMessage(chatId, MessageConst.BOOK_NOT_FOUND));
         } catch (UserNotFoundException e) {
-            LOG.error("user not found");
+            LOG.error("user {} not found", username);
             return List.of(new SendMessage(chatId, MessageConst.INTERNAL_ERROR));
         }
     }

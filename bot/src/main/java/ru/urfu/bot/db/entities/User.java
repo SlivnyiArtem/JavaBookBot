@@ -2,6 +2,8 @@ package ru.urfu.bot.db.entities;
 
 import jakarta.persistence.*;
 
+import java.time.OffsetTime;
+import java.time.ZoneOffset;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -46,4 +48,14 @@ public class User {
 
     @ManyToMany(mappedBy = "users")
     private final Set<Book> books = new HashSet<>();
+
+    private OffsetTime scheduledTime = OffsetTime.of(0, 0, 0, 0, ZoneOffset.ofHours(0));
+
+    public OffsetTime getScheduledTime() {
+        return scheduledTime;
+    }
+
+    public void setScheduledTime(OffsetTime scheduledTime) {
+        this.scheduledTime = scheduledTime;
+    }
 }

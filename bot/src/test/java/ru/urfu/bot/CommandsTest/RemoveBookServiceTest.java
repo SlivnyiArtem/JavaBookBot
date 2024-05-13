@@ -59,7 +59,6 @@ public class RemoveBookServiceTest {
 
         // Assert
         verify(user.getBooks()).remove(book);
-        verify(userRepository).save(user);
         verify(bookRepository).delete(book);
     }
 

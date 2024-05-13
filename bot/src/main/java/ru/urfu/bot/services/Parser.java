@@ -7,9 +7,17 @@ import ru.urfu.bot.utils.dto.CommandType;
 
 import static org.apache.commons.lang3.StringUtils.isNumeric;
 
+/**
+ * Парсит сообщения.
+ */
 @Service
 public class Parser {
 
+    /**
+     * Парсит обновления, имеющие коллбэк
+     * @param update обновление
+     * @return комманда
+     */
     public Command parseCallback(Update update) {
         String query = update.getCallbackQuery().getData();
         String data = query.split(" ").length == 2 && isNumeric(query.split(" ")[1])
@@ -23,6 +31,11 @@ public class Parser {
         };
     }
 
+    /**
+     * Парсит обновления с текстом
+     * @param update обновление
+     * @return комманда
+     */
     public Command parseCommand(Update update) {
         String query = update.getMessage().getText();
         String data = query.split(" ", 2).length > 1
@@ -33,6 +46,7 @@ public class Parser {
             case "/search" -> new Command(CommandType.SEARCH, data);
             case "/my_books" -> new Command(CommandType.PRINT, "");
             case "/help" -> new Command(CommandType.HELP, "");
+            case "/set_time" -> new Command(CommandType.SET_TIME, data);
             default -> new Command(CommandType.UNKNOWN, update.getMessage().getChatId().toString());
         };
     }

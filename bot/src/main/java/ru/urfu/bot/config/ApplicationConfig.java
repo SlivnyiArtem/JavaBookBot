@@ -4,6 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
@@ -20,6 +21,7 @@ import java.util.Map;
  * Конфигурация дополнительных бинов
  */
 @Configuration
+@EnableScheduling
 public class ApplicationConfig {
 
     @Bean
@@ -36,6 +38,7 @@ public class ApplicationConfig {
                 CommandType.START, context.getBean(StartBotService.class),
                 CommandType.SEARCH, context.getBean(SearchBookService.class),
                 CommandType.PRINT, context.getBean(PrintBooksService.class),
+                CommandType.SET_TIME, context.getBean(SetNotifyTimeService.class),
                 CommandType.HELP, context.getBean(HelpBotService.class),
                 CommandType.ADD, context.getBean(AddBookService.class),
                 CommandType.INFO, context.getBean(BookInfoService.class),

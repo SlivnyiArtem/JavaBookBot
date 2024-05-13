@@ -31,6 +31,7 @@ public class MessageConst {
                 /start - начать работать с ботом
                 /search {title} - поиск книги по названию
                 /my_books - вывести список книг
+                /set_time {time} - установить время для получения уведомлений (например '10:15+01:00' или '10:15:30+01:00')
                 /help - помощь
                 """;
 
@@ -39,4 +40,10 @@ public class MessageConst {
     public static final String EMPTY_LIST = "Книги не найдены";
 
     public static final String BOOK_NOT_FOUND = "Книга не найденна в коллекции пользователя";
+
+    public static final String BOOK_RELEASE = "Книга %s (isbn: %d) вышла";
+
+    public static final String BOOK_UPDATE_INFO = "Информация о книге %s (isbn: %d) обновленна";
+
+    public static final String SET_SCHEDULED_TIME = "Установленно время для получения уведомлений";
 }

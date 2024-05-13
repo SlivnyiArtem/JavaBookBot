@@ -8,6 +8,7 @@ import ru.urfu.bot.db.entities.User;
 import ru.urfu.bot.db.repositories.JpaChatRepository;
 import ru.urfu.bot.db.repositories.JpaUserRepository;
 import ru.urfu.bot.services.handlers.CommandHandler;
+import ru.urfu.bot.utils.MessageConst;
 import ru.urfu.bot.utils.dto.Command;
 
 import java.util.List;
@@ -41,6 +42,6 @@ public class StartBotService implements CommandHandler {
             chatRepository.save(chat);
         }
 
-        return List.of();
+        return List.of(new SendMessage(chatId, MessageConst.HELP));
     }
 }

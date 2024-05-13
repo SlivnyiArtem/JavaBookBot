@@ -9,8 +9,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -94,71 +94,59 @@ public class BookApiDto {
 
     @JsonProperty("volumeInfo")
     public void unpackNested(Map<String,Object> volumeInfo) {
-        try {
-            if (volumeInfo.get("industryIdentifiers") == null) {
-                throw new NoSuchElementException();
-            }
-            List<?> identifiers = (List<?>) volumeInfo.get("industryIdentifiers");
-            this.isbn13 = Long.parseLong(
-                    (String) identifiers.stream()
-                            .map(obj -> (Map<?,?>) obj)
-                            .filter(map -> Objects.equals(map.get("type"), "ISBN_13"))
-                            .findFirst()
-                            .orElseThrow()
-                            .get("identifier")
-            );
-        } catch (ClassCastException | NoSuchElementException e) {
-            LOG.warn("can't parse identifier", e);
-            // Если нет идентификатора, значит объект не годен
-            return;
-        }
 
         try {
-            if (volumeInfo.get("title") == null) {
-                throw new NoSuchElementException();
-            }
-            this.title = (String) volumeInfo.get("title");
-        } catch (ClassCastException | NoSuchElementException e) {
-            LOG.warn("can't parse title", e);
-        }
+            List<?> identifiers = Optional.ofNullable( Optional.ofNullable(volumeInfo.get("industryIdentifiers"))
+                            .orElseThrow(() -> new DtoCustomNoSuchElementExc(null, BookDtoFieldEnum.IDENTIFIER)))
+                    .filter(List.class::isInstance)
+                    .map(List.class::cast)
+                    .orElseThrow(() -> new DtoCastCustomExc(null, BookDtoFieldEnum.IDENTIFIER));
 
-        try {
-            if (volumeInfo.get("description") == null) {
-                throw new NoSuchElementException();
-            }
-            this.description = (String) volumeInfo.get("description");
-        } catch (ClassCastException | NoSuchElementException e) {
-            LOG.warn("can't parse description", e);
-        }
+            this.isbn13 = Long.parseLong(Optional.of( identifiers.stream()
+                    .map(obj -> (Map<?,?>) obj)
+                    .filter(map -> Objects.equals(map.get("type"), "ISBN_13"))
+                    .findFirst()
+                    .orElseThrow(() -> new DtoCustomNoSuchElementExc(null, BookDtoFieldEnum.IDENTIFIER))
+                    .get("identifier"))
+                    .filter(String.class::isInstance).map(String.class::cast)
+                    .orElseThrow(() -> new DtoCastCustomExc(null, BookDtoFieldEnum.IDENTIFIER)));
 
-        try {
-            if (volumeInfo.get("authors") == null) {
-                throw new NoSuchElementException();
-            }
-            List<?> authorsList = (List<?>) volumeInfo.get("authors");
+            this.title = Optional.of(Optional.ofNullable(volumeInfo.get("title"))
+                            .orElseThrow(() -> new DtoCustomNoSuchElementExc(null, BookDtoFieldEnum.TITLE)))
+                    .filter(String.class::isInstance).map(String.class::cast)
+                    .orElseThrow(() -> new DtoCastCustomExc(null, BookDtoFieldEnum.TITLE));
+
+            this.description = Optional.of(Optional.ofNullable(volumeInfo.get("description"))
+                    .orElseThrow(() -> new DtoCustomNoSuchElementExc(null, BookDtoFieldEnum.DESC)))
+                    .filter(String.class::isInstance).map(String.class::cast)
+                    .orElseThrow(() -> new DtoCastCustomExc(null, BookDtoFieldEnum.DESC));
+
+            List<?> authorsList = Optional.of( Optional.ofNullable(volumeInfo.get("authors"))
+                    .orElseThrow(() -> new DtoCustomNoSuchElementExc(null, BookDtoFieldEnum.AUTHORS)))
+                    .filter(List.class::isInstance).map(List.class::cast)
+                    .orElseThrow(() -> new DtoCastCustomExc(null, BookDtoFieldEnum.AUTHORS));
+
             this.authors = authorsList.stream()
-                    .map(obj -> (String) obj)
+                    .map(obj -> Optional.of(obj)
+                            .filter(String.class::isInstance).map(String.class::cast)
+                    .orElseThrow(() -> new DtoCastCustomExc(null, BookDtoFieldEnum.AUTHORS)))
                     .collect(Collectors.joining(", "));
-        } catch (ClassCastException | NoSuchElementException e) {
-            LOG.warn("can't parse authors list", e);
-        }
 
-        try {
-            if (volumeInfo.get("publisher") == null) {
-                throw new NoSuchElementException();
-            }
-            this.publisher = (String) volumeInfo.get("publisher");
-        } catch (ClassCastException | NoSuchElementException e) {
-            LOG.warn("can't parse publisher", e);
-        }
-
-        try {
-            if (volumeInfo.get("publishedDate") == null) {
-                throw new NoSuchElementException();
-            }
-            this.publishedDate = LocalDate.parse((String) volumeInfo.get("publishedDate"));
-        } catch (ClassCastException | NoSuchElementException | DateTimeParseException e) {
-            LOG.warn("can't parse published date", e);
+            this.publisher = Optional.of(Optional.ofNullable(volumeInfo.get("publisher"))
+                    .orElseThrow(() -> new DtoCustomNoSuchElementExc(null, BookDtoFieldEnum.PUBLISHER)))
+                    .filter(String.class::isInstance).map(String.class::cast)
+                    .orElseThrow(() -> new DtoCastCustomExc(null, BookDtoFieldEnum.PUBLISHER));
+            
+            this.publishedDate = LocalDate.parse(Optional.of(Optional.ofNullable(volumeInfo.get("publishedDate"))
+                    .orElseThrow(() -> new DtoCustomNoSuchElementExc(null, BookDtoFieldEnum.PBDATE)))
+                    .filter(String.class::isInstance).map(String.class::cast)
+                    .orElseThrow(() -> new DtoCastCustomExc(null, BookDtoFieldEnum.PBDATE)));
+        }catch (DtoCastCustomExc exc) {
+            LOG.warn(String.format("can't parse %s", exc.getField()), exc);
+        }catch (DtoCustomNoSuchElementExc exc) {
+            LOG.warn(String.format("can't parse %s", exc.getField()), exc);
+        }catch (DateTimeParseException exc){
+            LOG.warn("can't parse published date", exc);
         }
     }
 }
