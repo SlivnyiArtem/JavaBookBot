@@ -11,7 +11,7 @@ import javax.validation.constraints.NotEmpty;
  * @param telegramToken - токен телеграм бота
  * @param telegramBotName - имя бота
  * @param apiKey - ключ для аутентификации в Google Books API (пока не используется)
- * @param bookApiBaseUrl - url для общения с api
+ * @param bookApiBaseUrl - url для общения с API
  */
 @Validated
 @ConfigurationProperties(prefix = "app", ignoreUnknownFields = false)
