@@ -7,8 +7,10 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.urfu.bot.handler.UpdateHandler;
 import ru.urfu.bot.utils.MessageConst;
 
-import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -21,14 +23,20 @@ public abstract class CallbackUpdateHandler implements UpdateHandler {
     @Override
     public final List<SendMessage> process(Update update) {
         if (!canHandle(update)) {
+            logger.error("canHandle() must be invoked before process()");
             return List.of();
         }
-        Command command = parseUpdate(update);
         try {
-            return execute(command);
+            Command command = parseUpdate(update);
+            try {
+                return execute(command);
+            } catch (Exception e) {
+                logger.warn(e.getMessage());
+                return List.of(new SendMessage(command.chatId().toString(), MessageConst.INTERNAL_SERVER_ERROR));
+            }
         } catch (Exception e) {
-            logger.warn(e.getMessage());
-            return List.of(new SendMessage(command.chatId().toString(), MessageConst.INTERNAL_SERVER_ERROR));
+            logger.error("can't parse update or canHandle() not been invoked");
+            return List.of();
         }
     }
 
@@ -41,13 +49,13 @@ public abstract class CallbackUpdateHandler implements UpdateHandler {
 
     @Override
     public final boolean canHandle(Update update) {
-        if (update.hasCallbackQuery()) {
-            try {
+        try {
+            if (update.hasCallbackQuery()) {
                 String[] data = parseUpdate(update).args();
                 return canExecute(data);
-            } catch (NullPointerException | ConstraintViolationException e) {
-                logger.warn(e.getMessage());
             }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
         }
         return false;
     }
@@ -67,4 +75,6 @@ public abstract class CallbackUpdateHandler implements UpdateHandler {
                 update.getCallbackQuery().getMessage().getChatId()
         );
     }
+
+    protected record Command(@NotEmpty String[] args, @NotBlank String username, @NotNull Long chatId) { }
 }

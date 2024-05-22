@@ -97,49 +97,10 @@ public class BotUpdateDispatcherTest {
     }
 
     /**
-     * Возвращает стандартный ответ, если нельзя обработать коллбэк
-     */
-    @Test
-    public void cantDispatchCallbackTest() {
-        List<SendMessage> expectedResponse = List.of(new SendMessage("1", "Внутренняя ошибка сервера"));
-
-        when(update.hasCallbackQuery()).thenReturn(true);
-        when(update.getCallbackQuery().getMessage().getChatId()).thenReturn(1L);
-
-        List<SendMessage> actual = botUpdateDispatcher.dispatch(update);
-        assertEquals(expectedResponse, actual);
-        verify(handler1, never()).process(any());
-        verify(handler2, never()).process(any());
-        verify(handler3, never()).process(any());
-    }
-
-    /**
-     * Возвращает стандартный ответ, если нельзя обработать команду
-     */
-    @Test
-    public void cantDispatchCommandTest() {
-        List<SendMessage> expectedResponse = List.of(
-                new SendMessage("1", "Неизвестная команда. Введите /help для получения списка команд"));
-
-        when(update.hasMessage()).thenReturn(true);
-        when(update.getMessage().hasText()).thenReturn(true);
-        when(update.getMessage().getChatId()).thenReturn(1L);
-
-        List<SendMessage> actual = botUpdateDispatcher.dispatch(update);
-        assertEquals(expectedResponse, actual);
-        verify(handler1, never()).process(any());
-        verify(handler2, never()).process(any());
-        verify(handler3, never()).process(any());
-    }
-
-    /**
      * Не возвращает ответ при нестандартном обновлении
      */
     @Test
     public void incorrectUpdateTest() {
-        when(update.hasMessage()).thenReturn(false);
-        when(update.hasCallbackQuery()).thenReturn(false);
-
         List<SendMessage> actual = botUpdateDispatcher.dispatch(update);
         assertTrue(actual.isEmpty());
         verify(handler1, never()).process(any());

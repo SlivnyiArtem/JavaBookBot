@@ -1,11 +1,11 @@
 package ru.urfu.bot.handler.callbacks;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import ru.urfu.bot.domain.Book;
 import ru.urfu.bot.service.BookTrackingService;
 import ru.urfu.bot.utils.MessageConst;
+import ru.urfu.bot.utils.OrderedHandler;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -15,7 +15,7 @@ import static org.apache.commons.lang3.StringUtils.isNumeric;
 /**
  * Выводит информацию о книге по ISBN из базы данных.
  */
-@Component
+@OrderedHandler
 public class BookInfoCallbackHandler extends CallbackUpdateHandler {
 
     private final BookTrackingService bookTrackingService;

@@ -8,6 +8,9 @@ import ru.urfu.bot.handler.UpdateHandler;
 import ru.urfu.bot.utils.MessageConst;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -20,14 +23,20 @@ public abstract class CommandUpdateHandler implements UpdateHandler {
     @Override
     public final List<SendMessage> process(Update update) {
         if (!canHandle(update)) {
+            logger.error("canHandle() must be invoked before process()");
             return List.of();
         }
-        Command command = parseUpdate(update);
         try {
-            return execute(command);
+            Command command = parseUpdate(update);
+            try {
+                return execute(command);
+            } catch (Exception e) {
+                logger.warn(e.getMessage());
+                return List.of(new SendMessage(command.chatId().toString(), MessageConst.INTERNAL_SERVER_ERROR));
+            }
         } catch (Exception e) {
-            logger.warn(e.getMessage());
-            return List.of(new SendMessage(command.chatId().toString(), MessageConst.INTERNAL_SERVER_ERROR));
+            logger.error("can't parse update or canHandle() not been invoked");
+            return List.of();
         }
     }
 
@@ -40,13 +49,12 @@ public abstract class CommandUpdateHandler implements UpdateHandler {
 
     @Override
     public final boolean canHandle(Update update) {
-        if (update.hasMessage() && update.getMessage().hasText()) {
-            try {
+        try {
+            if (update.hasMessage() && update.getMessage().hasText()) {
                 String[] data = parseUpdate(update).args();
                 return canExecute(data);
-            } catch (Exception e) {
-                logger.warn(e.getMessage());
             }
+        } catch (Exception ignored) {
         }
         return false;
     }
@@ -66,4 +74,6 @@ public abstract class CommandUpdateHandler implements UpdateHandler {
                 update.getMessage().getChat().getId()
         );
     }
+
+    protected record Command(@NotEmpty String[] args, @NotBlank String username, @NotNull Long chatId) { }
 }

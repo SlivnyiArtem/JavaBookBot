@@ -3,17 +3,17 @@ package ru.urfu.bot.handler.commands;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import ru.urfu.bot.service.ChatUserService;
 import ru.urfu.bot.utils.MessageConst;
+import ru.urfu.bot.utils.OrderedHandler;
 
 import java.util.List;
 
 /**
  * Запускает бота и записывает пользователя и чат в бд.
  */
-@Component
+@OrderedHandler
 public class StartBotCommandHandler extends CommandUpdateHandler {
 
     private final ChatUserService chatUserService;

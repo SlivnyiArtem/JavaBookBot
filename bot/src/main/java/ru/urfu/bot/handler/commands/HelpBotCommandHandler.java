@@ -1,15 +1,15 @@
 package ru.urfu.bot.handler.commands;
 
-import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import ru.urfu.bot.utils.MessageConst;
+import ru.urfu.bot.utils.OrderedHandler;
 
 import java.util.List;
 
 /**
  * Выводит список доступных комманд.
  */
-@Component
+@OrderedHandler
 public class HelpBotCommandHandler extends CommandUpdateHandler {
 
     @Override
