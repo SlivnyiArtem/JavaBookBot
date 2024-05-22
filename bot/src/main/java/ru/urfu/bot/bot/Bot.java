@@ -2,11 +2,16 @@ package ru.urfu.bot.bot;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import ru.urfu.bot.config.BotProperties;
 import ru.urfu.bot.services.QueueProvider;
 
@@ -19,24 +24,38 @@ import java.util.concurrent.BlockingQueue;
 @Component
 public class Bot extends TelegramLongPollingBot {
 
-    private final static Logger LOG = LoggerFactory.getLogger(Bot.class);
-
     private final String userName;
 
+    private final BotUpdateDispatcher botUpdateDispatcher;
+
+    private final Logger logger = LoggerFactory.getLogger(Bot.class);
     private final BlockingQueue<Update> receiveQueue;
 
     /**
-     * Конфигурирует и запускает бота
+     * Конфигурирует бота
      */
-    public Bot(
-            TelegramBotsApi telegramBotsApi,
-            BotProperties properties,
-            QueueProvider queueProvider) throws TelegramApiException {
+    @Autowired
+    public Bot(BotProperties properties,
+               BotUpdateDispatcher botUpdateDispatcher,
+               QueueProvider queueProvider) {
 
         super(properties.telegramToken());
         this.userName = properties.telegramBotName();
+        this.botUpdateDispatcher = botUpdateDispatcher;
         this.receiveQueue = queueProvider.getReceiveQueue();
-        telegramBotsApi.registerBot(this);
+    }
+
+    /**
+     * Запускает бота
+     */
+    @PostConstruct
+    public void start() {
+        try {
+            TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
+            telegramBotsApi.registerBot(this);
+        } catch (TelegramApiException e) {
+            logger.error(e.getMessage());
+        }
     }
 
     /**
@@ -44,11 +63,14 @@ public class Bot extends TelegramLongPollingBot {
      */
     @Override
     public void onUpdateReceived(Update update) {
-        try {
-            receiveQueue.put(update);
-        } catch (InterruptedException e) {
-            LOG.error(e.getMessage());
-        }
+        List<SendMessage> response = botUpdateDispatcher.dispatch(update);
+        response.forEach(message -> {
+            try {
+                execute(message);
+            } catch (TelegramApiException e) {
+                logger.warn("can't execute message", e);
+            }
+        });
     }
 
     @Override
