@@ -1,0 +1,28 @@
+version: "3.8"
+networks:
+  my_docker_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+
+volumes:
+  postgres_data:
+    driver: local
+
+services:
+  postgresql:
+    container_name: postgres_db_bb
+    image: postgres:16.2-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - my_docker_network
+
