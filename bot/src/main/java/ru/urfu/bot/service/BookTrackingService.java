@@ -144,7 +144,12 @@ public class BookTrackingService {
                                 && book1.getAuthors().equals(book.getAuthors())
                                 && book1.getPublisher().equals(book.getPublisher())
                                 && book1.getPublishedDate().equals(book.getPublishedDate()))) {
-                            bookRepository.save(book1);
+                            book.setTitle(book1.getTitle());
+                            book.setDescription(book1.getDescription());
+                            book.setAuthors(book1.getAuthors());
+                            book.setPublisher(book1.getPublisher());
+                            book.setPublishedDate(book1.getPublishedDate());
+                            bookRepository.save(book);
                             return true;
                         }
                     }
