@@ -1,32 +1,52 @@
 package ru.urfu.bot.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.Duration;
 
 /**
- * Устанавливает переменные для приложения
- * @param telegramToken - токен телеграм бота
- * @param telegramBotName - имя бота
- * @param apiKey - ключ для аутентификации в Google Books API (пока не используется)
- * @param bookApiBaseUrl - url для общения с api
+ * @param telegram Настроики телеграм-бота
+ * @param scheduler Настройки планировщика
+ * @param bookApi Настройки клиента для API с книгами
  */
 @Validated
 @ConfigurationProperties(value = "app", ignoreUnknownFields = false)
 @PropertySource("classpath:application.yml")
 public record BotProperties(
-        @NotEmpty
-        String telegramToken,
-        @NotEmpty
-        String telegramBotName,
-        @NotEmpty
-        String apiKey,
-        @NotEmpty
-        String bookApiBaseUrl,
-        @NotEmpty
-        Duration updateInfoDelay
+        @NotNull @Bean
+        Telegram telegram,
+        @NotNull @Bean
+        Scheduler scheduler,
+        @NotNull @Bean
+        BookApi bookApi
 ) {
+
+        /**
+         * @param token токен
+         * @param botName имя
+         */
+        public record Telegram(@NotBlank String token, @NotBlank String botName) {
+        }
+
+        /**
+         * @param updateInfoDelay частота проверки обновлений у книг
+         * @param checkReleaseDelay частота проверки выхода книг
+         * @param receivedProcessDelay частота обработки входящих обновлений
+         * @param sendDelay частота отправки сообщений
+         */
+        public record Scheduler(@NotNull Duration updateInfoDelay, @NotNull Duration checkReleaseDelay,
+                         @NotNull Duration receivedProcessDelay, @NotNull Duration sendDelay) {
+        }
+
+        /**
+         * @param apiKey ключ авторизации (не используется)
+         * @param baseUrl хост
+         */
+        public record BookApi(@NotBlank String apiKey, @NotBlank String baseUrl) {
+        }
 }

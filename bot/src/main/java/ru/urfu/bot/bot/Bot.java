@@ -1,14 +1,16 @@
 package ru.urfu.bot.bot;
 
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import ru.urfu.bot.config.BotProperties;
-import ru.urfu.bot.services.QueueProvider;
 
 import java.util.concurrent.BlockingQueue;
 
@@ -19,24 +21,32 @@ import java.util.concurrent.BlockingQueue;
 @Component
 public class Bot extends TelegramLongPollingBot {
 
-    private final static Logger LOG = LoggerFactory.getLogger(Bot.class);
-
     private final String userName;
-
-    private final BlockingQueue<Update> receiveQueue;
+    private final Logger logger = LoggerFactory.getLogger(Bot.class);
+    private final BlockingQueue<Update> receivedQueue;
 
     /**
-     * Конфигурирует и запускает бота
+     * Конфигурирует бота
      */
-    public Bot(
-            TelegramBotsApi telegramBotsApi,
-            BotProperties properties,
-            QueueProvider queueProvider) throws TelegramApiException {
+    @Autowired
+    public Bot(BotProperties.Telegram telegramProperties,
+               BlockingQueue<Update> receivedQueue) {
+        super(telegramProperties.token());
+        this.userName = telegramProperties.botName();
+        this.receivedQueue = receivedQueue;
+    }
 
-        super(properties.telegramToken());
-        this.userName = properties.telegramBotName();
-        this.receiveQueue = queueProvider.getReceiveQueue();
-        telegramBotsApi.registerBot(this);
+    /**
+     * Запускает бота
+     */
+    @PostConstruct
+    public void start() {
+        try {
+            TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
+            telegramBotsApi.registerBot(this);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -45,9 +55,9 @@ public class Bot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         try {
-            receiveQueue.put(update);
+            receivedQueue.put(update);
         } catch (InterruptedException e) {
-            LOG.error(e.getMessage());
+            logger.error(e.getMessage());
         }
     }
 

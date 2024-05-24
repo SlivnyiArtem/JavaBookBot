@@ -5,13 +5,13 @@ package ru.urfu.bot.utils;
  */
 public class MessageConst {
 
-    public static final String ADD_BOOK = "Книга добавленна в избранное";
+    public static final String ADD_BOOK = "Книга добавлена в избранное";
 
-    public static final String REMOVE_BOOK = "Книга удаленна из избранных";
+    public static final String REMOVE_BOOK = "Книга удалена из избранных";
 
-    public static final String BOOK_INFO = "isbn: %d\nНазвание: %s\nОписание: %s\nАвторы: %s\nИздатель: %s\nДата издания: %s";
+    public static final String BOOK_INFO = "ISBN: %d\nНазвание: %s\nОписание: %s\nАвторы: %s\nИздатель: %s\nДата издания: %s";
 
-    public static final String BOOK_INFO_SHORT = "isbn: %d\nНазвание: %s\nАвторы: %s\nДата издания: %s";
+    public static final String BOOK_INFO_SHORT = "ISBN: %d\nНазвание: %s\nАвторы: %s\nДата издания: %s";
 
     public static final String ADD_BUTTON_CALLBACK = "/add_book %d";
 
@@ -35,11 +35,9 @@ public class MessageConst {
                 /help - помощь
                 """;
 
-    public static final String INTERNAL_ERROR = "Внутренняя ошибка сервера";
+    public static final String INTERNAL_SERVER_ERROR = "Внутренняя ошибка сервера";
 
     public static final String EMPTY_LIST = "Книги не найдены";
-
-    public static final String BOOK_NOT_FOUND = "Книга не найденна в коллекции пользователя";
 
     public static final String BOOK_RELEASE = "Книга %s (isbn: %d) вышла";
 
