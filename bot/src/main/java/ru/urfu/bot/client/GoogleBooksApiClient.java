@@ -21,9 +21,9 @@ public class GoogleBooksApiClient {
     private final WebClient webClient;
 
     @Autowired
-    public GoogleBooksApiClient(BotProperties botProperties) {
-        this.apiKey = botProperties.apiKey();
-        this.webClient = WebClient.create(botProperties.bookApiBaseUrl());
+    public GoogleBooksApiClient(BotProperties.BookApi bookApiProperties) {
+        this.apiKey = bookApiProperties.apiKey();
+        this.webClient = WebClient.create(bookApiProperties.baseUrl());
     }
 
     /**
@@ -73,7 +73,6 @@ public class GoogleBooksApiClient {
     /**
      * Дто для парсинга JSON ответа из API
      * <br/><br/>
-     * P.S. вроде это не тот static который запрещен
      */
     private static class BookList {
 

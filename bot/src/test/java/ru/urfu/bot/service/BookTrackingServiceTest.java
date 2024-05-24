@@ -11,6 +11,8 @@ import ru.urfu.bot.domain.User;
 import ru.urfu.bot.repository.JpaBookRepository;
 import ru.urfu.bot.repository.JpaUserRepository;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -164,5 +166,71 @@ public class BookTrackingServiceTest {
 
         Exception e = assertThrows(NoSuchElementException.class, () -> bookTrackingService.untrackBook(isbn, username));
         assertEquals("user %s not found in DB".formatted(username), e.getMessage());
+    }
+
+    /**
+     * Выбираются только книги, у которых дата публикации равна заданной
+     */
+    @Test
+    public void checkReleaseTest() {
+        Book book1 = new Book();
+        book1.setIsbn(1L);
+        book1.setTitle("book1");
+        book1.setPublishedDate(LocalDate.of(2000, 1, 2));
+        Book book2 = new Book();
+        book2.setIsbn(2L);
+        book2.setTitle("book2");
+        book2.setPublishedDate(LocalDate.of(2000, 1, 3));
+        Book book3 = new Book();
+        book3.setIsbn(3L);
+        book3.setTitle("book3");
+        book3.setPublishedDate(LocalDate.of(2000, 1, 1));
+        Book book4 = new Book();
+        book4.setIsbn(4L);
+        book4.setTitle("book4");
+
+        when(bookRepository.findAll()).thenReturn(List.of(book1, book2, book3, book4));
+
+        LocalDate now = LocalDate.of(2000, 1, 2);
+
+        List<Book> actual = bookTrackingService.getReleasedBook(now);
+        assertEquals(List.of(book1), actual);
+    }
+
+    /**
+     * <ul>
+     *     <li>если у книги изменилось поле, то обновляем и возвращаем книгу</li>
+     *     <li>если у книги поля не изменились или книга не возвращается из API, то не возвращаем</li>
+     * </ul>
+     */
+    @Test
+    public void checkUpdateInfoTest() {
+        Book book1 = new Book();
+        book1.setIsbn(1L);
+        book1.setTitle("book1");
+        Book book2 = new Book();
+        book2.setIsbn(2L);
+        book2.setTitle("book2");
+        Book book3 = new Book();
+        book3.setIsbn(3L);
+        book3.setTitle("book3");
+        Book book4 = new Book();
+        book4.setIsbn(4L);
+        book4.setTitle("book4");
+
+        when(bookRepository.findAll()).thenReturn(List.of(book1, book2, book3, book4));
+
+        Book book11 = new Book();
+        book11.setIsbn(1L);
+        book11.setTitle("new title 1");
+        Book book12 = new Book();
+        book12.setIsbn(2L);
+        when(booksApiClient.findBookByIsbn(1L)).thenReturn(Optional.of(book11));
+        when(booksApiClient.findBookByIsbn(2L)).thenReturn(Optional.of(book12));
+        when(booksApiClient.findBookByIsbn(3L)).thenReturn(Optional.of(book3));
+        when(booksApiClient.findBookByIsbn(4L)).thenReturn(Optional.empty());
+
+        List<Book> actual = bookTrackingService.getUpdatedBook();
+        assertEquals(List.of(book1, book2), actual);
     }
 }
