@@ -1,37 +1,41 @@
-package ru.urfu.bot.services;
+package ru.urfu.bot.utils;
 
-import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethodMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import ru.urfu.bot.utils.dto.SendScheduledMessage;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 
 /**
- * Сервис предоставляет две блокирующие очереди: для отправляемых сообщений и
+ * Предоставляет две блокирующие очереди: для отправляемых сообщений и
  * получаемых обновлений
  */
-@Service
+@Component
 public class QueueProvider {
 
-    private final BlockingQueue<SendMessage> sendQueue;
+    /**
+     * Максимальный размер очередей
+     */
+    public static final int INITIAL_CAPACITY = 10;
 
-    private final BlockingQueue<Update> receiveQueue;
+    private final BlockingQueue<BotApiMethodMessage> sendQueue;
+
+    private final BlockingQueue<Update> receivedQueue;
 
     /**
      * @return очередь с сообщениями для отправки
      */
-    public BlockingQueue<SendMessage> getSendQueue() {
+    public BlockingQueue<BotApiMethodMessage> getSendQueue() {
         return sendQueue;
     }
 
     /**
      * @return очередь с обновлениями для обработки
      */
-    public BlockingQueue<Update> getReceiveQueue() {
-        return receiveQueue;
+    public BlockingQueue<Update> getReceivedQueue() {
+        return receivedQueue;
     }
 
     /**
@@ -40,7 +44,7 @@ public class QueueProvider {
      * отправки, а также сообщения без указанного времени.
      */
     public QueueProvider() {
-        sendQueue = new PriorityBlockingQueue<>(10, (o1, o2) -> {
+        sendQueue = new PriorityBlockingQueue<>(INITIAL_CAPACITY, (o1, o2) -> {
             if (o1.equals(o2)) {
                 return 0;
             }
@@ -52,6 +56,6 @@ public class QueueProvider {
             }
             return -1;
         });
-        receiveQueue = new LinkedBlockingQueue<>();
+        receivedQueue = new LinkedBlockingQueue<>(INITIAL_CAPACITY);
     }
 }

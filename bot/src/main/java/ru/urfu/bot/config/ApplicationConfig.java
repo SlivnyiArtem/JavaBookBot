@@ -1,57 +1,42 @@
 package ru.urfu.bot.config;
 
-import org.modelmapper.ModelMapper;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.telegram.telegrambots.meta.TelegramBotsApi;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
-import ru.urfu.bot.services.handlers.CommandHandler;
-import ru.urfu.bot.services.handlers.callbacks.AddBookService;
-import ru.urfu.bot.services.handlers.callbacks.BookInfoService;
-import ru.urfu.bot.services.handlers.callbacks.RemoveBookService;
-import ru.urfu.bot.services.handlers.commands.*;
-import ru.urfu.bot.utils.dto.CommandType;
+import ru.urfu.bot.bot.Bot;
+import ru.urfu.bot.handler.UpdateHandler;
+import ru.urfu.bot.service.BookTrackingService;
+import ru.urfu.bot.utils.QueueProvider;
+import ru.urfu.bot.worker.BookWorker;
+import ru.urfu.bot.worker.DispatchUpdateWorker;
+import ru.urfu.bot.worker.SendMessageWorker;
 
-import java.util.Map;
+import java.util.List;
 
 /**
- * Конфигурация дополнительных бинов
+ * Конфигурация бинов
  */
 @Configuration
 @EnableScheduling
 public class ApplicationConfig {
 
     @Bean
-    TelegramBotsApi telegramBotsApi() throws TelegramApiException {
-        return new TelegramBotsApi(DefaultBotSession.class);
+    public Bot bot(BotProperties.Telegram telegramProperties, QueueProvider queueProvider) {
+        return new Bot(telegramProperties, queueProvider.getReceivedQueue());
     }
 
-    /**
-     * Обработчики для команда, вводимых пользователем
-     */
     @Bean
-    Map<CommandType, CommandHandler> commandMap(ApplicationContext context) {
-        return Map.of(
-                CommandType.START, context.getBean(StartBotService.class),
-                CommandType.SEARCH, context.getBean(SearchBookService.class),
-                CommandType.PRINT, context.getBean(PrintBooksService.class),
-                CommandType.SET_TIME, context.getBean(SetNotifyTimeService.class),
-                CommandType.HELP, context.getBean(HelpBotService.class),
-                CommandType.ADD, context.getBean(AddBookService.class),
-                CommandType.INFO, context.getBean(BookInfoService.class),
-                CommandType.REMOVE, context.getBean(RemoveBookService.class),
-                CommandType.UNKNOWN, context.getBean(DefaultHandlerService.class)
-        );
+    public BookWorker bookWorker(BookTrackingService bookTrackingService, QueueProvider queueProvider) {
+        return new BookWorker(bookTrackingService, queueProvider.getSendQueue());
     }
 
-    /**
-     * Объект, предназначенный для конвертации dto и моделей (сущностей)
-     */
     @Bean
-    public ModelMapper modelMapper() {
-        return new ModelMapper();
+    public DispatchUpdateWorker dispatchUpdateWorker(List<UpdateHandler> updateHandlers, QueueProvider queueProvider) {
+        return new DispatchUpdateWorker(updateHandlers, queueProvider.getSendQueue(), queueProvider.getReceivedQueue());
+    }
+
+    @Bean
+    public SendMessageWorker sendMessageWorker(Bot bot, QueueProvider queueProvider) {
+        return new SendMessageWorker(queueProvider.getSendQueue(), bot);
     }
 }

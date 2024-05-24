@@ -1,57 +1,50 @@
-package ru.urfu.bot.services;
+package ru.urfu.bot.worker;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethodMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import ru.urfu.bot.controllers.GoogleBooksApiClient;
-import ru.urfu.bot.db.entities.Book;
-import ru.urfu.bot.db.repositories.JpaBookRepository;
+import ru.urfu.bot.domain.Book;
+import ru.urfu.bot.service.BookTrackingService;
 import ru.urfu.bot.utils.MessageConst;
-import ru.urfu.bot.utils.dto.SendScheduledMessage;
+import ru.urfu.bot.utils.SendScheduledMessage;
 
 import java.time.LocalDate;
 import java.time.OffsetTime;
-import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 /**
- * Сервис переодически в отдельных потоках независимо выпольняет две задачи:
+ * Воркер переодически в отдельных потоках независимо выполняет две задачи:
  * <ul>
  *     <li>Проверяет не наступила ли дата выхода для каждой книги, сохраненной в бд</li>
  *     <li>Обновляет устаревшую информацию о книгах в бд из внешнего сервиса</li>
  * </ul>
  */
-@Service
-public class SchedulerService {
+@Component
+public class BookWorker {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SchedulerService.class);
+    private final Logger logger = LoggerFactory.getLogger(BookWorker.class);
 
-    private final BlockingQueue<SendMessage> sendQueue;
+    private final BlockingQueue<BotApiMethodMessage> sendQueue;
 
-    public SchedulerService(JpaBookRepository bookRepository, GoogleBooksApiClient booksApiClient, QueueProvider queueProvider) {
-        this.bookRepository = bookRepository;
-        this.booksApiClient = booksApiClient;
-        this.sendQueue = queueProvider.getSendQueue();
+    public BookWorker(BookTrackingService bookTrackingService, BlockingQueue<BotApiMethodMessage> sendQueue) {
+        this.bookTrackingService = bookTrackingService;
+        this.sendQueue = sendQueue;
     }
 
-    private final JpaBookRepository bookRepository;
-
-    private final GoogleBooksApiClient booksApiClient;
+    private final BookTrackingService bookTrackingService;
 
     /**
      * Переодически отправляет сообщения подписчикам книги, если она вышла
      */
-    @Scheduled(fixedRate = 1, timeUnit = TimeUnit.DAYS)
+    @Scheduled(fixedDelayString = "#{ @scheduler.checkReleaseDelay() }")
     @Transactional
     public void checkReleaseDate() {
-        LOG.trace("check if book released");
-        bookRepository.findAll().stream()
-                .filter(book -> book.getPublishedDate() != null
-                        && book.getPublishedDate().equals(LocalDate.now()))
+        logger.trace("check if book released");
+        bookTrackingService.getReleasedBook(LocalDate.now()).stream()
                 .flatMap(book -> book.getUsers().stream()
                         .flatMap(user -> user.getChats().stream()
                                 .map(chat ->
@@ -60,15 +53,16 @@ public class SchedulerService {
                     try {
                         sendQueue.put(message);
                     } catch (InterruptedException e) {
-                        LOG.error(e.getMessage());
+                        logger.error(e.getMessage());
                     }
                 });
     }
 
-    private SendMessage getReleaseMessage(String chatId, OffsetTime scheduledTime, Book book) {
+    private BotApiMethodMessage getReleaseMessage(String chatId, OffsetTime scheduledTime, Book book) {
+        SendMessage sendMessage = new SendMessage(chatId,
+                MessageConst.BOOK_RELEASE.formatted(book.getTitle(), book.getIsbn()));
         return new SendScheduledMessage(
-                chatId,
-                MessageConst.BOOK_RELEASE.formatted(book.getTitle(), book.getIsbn13()),
+                sendMessage,
                 scheduledTime.atDate(LocalDate.now(scheduledTime.getOffset()))
         );
     }
@@ -77,19 +71,11 @@ public class SchedulerService {
      * Переодически проверяет, не устарела ли иноформация о книгах. Если да, то
      * сохраняет новую информацию в бд и отправляет уведомление подписчикам
      */
-    @Scheduled(fixedRateString = "#{ @'app-ru.urfu.bot.config.BotProperties'.updateInfoDelay() }")
+    @Scheduled(fixedDelayString = "#{ @scheduler.updateInfoDelay() }")
     @Transactional
     public void checkUpdateInfo() {
-        LOG.trace("check if book info updated");
-        bookRepository.findAll().stream()
-                .filter(book -> {
-                    Optional<Book> book1 = booksApiClient.findBookByIsbn(book.getIsbn13());
-                    if (book1.isPresent() && !book1.get().equals(book)) {
-                        bookRepository.save(book1.get());
-                        return true;
-                    }
-                    return false;
-                })
+        logger.trace("check if book info updated");
+        bookTrackingService.getUpdatedBook().stream()
                 .flatMap(book -> book.getUsers().stream()
                         .flatMap(user -> user.getChats().stream()
                                 .map(chat ->
@@ -98,15 +84,16 @@ public class SchedulerService {
                     try {
                         sendQueue.put(message);
                     } catch (InterruptedException e) {
-                        LOG.error(e.getMessage());
+                        logger.error(e.getMessage());
                     }
                 });
     }
 
-    private SendMessage getUpdateInfoMessage(String chatId, OffsetTime scheduledTime, Book book) {
+    private BotApiMethodMessage getUpdateInfoMessage(String chatId, OffsetTime scheduledTime, Book book) {
+        SendMessage sendMessage = new SendMessage(chatId,
+                MessageConst.BOOK_UPDATE_INFO.formatted(book.getTitle(), book.getIsbn()));
         return new SendScheduledMessage(
-                chatId,
-                MessageConst.BOOK_UPDATE_INFO.formatted(book.getTitle(), book.getIsbn13()),
+                sendMessage,
                 scheduledTime.atDate(LocalDate.now(scheduledTime.getOffset()))
         );
     }

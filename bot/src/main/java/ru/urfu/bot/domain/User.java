@@ -49,7 +49,7 @@ public class User {
     @ManyToMany(mappedBy = "users")
     private final Set<Book> books = new HashSet<>();
 
-    private OffsetTime scheduledTime = OffsetTime.of(0, 0, 0, 0, ZoneOffset.ofHours(0));
+    private OffsetTime scheduledTime = OffsetTime.of(0, 0, 0, 0, ZoneOffset.UTC);
 
     public OffsetTime getScheduledTime() {
         return scheduledTime;

@@ -10,10 +10,12 @@ import ru.urfu.bot.domain.User;
 import ru.urfu.bot.repository.JpaChatRepository;
 import ru.urfu.bot.repository.JpaUserRepository;
 
+import java.time.OffsetTime;
+import java.time.ZoneOffset;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -58,5 +60,25 @@ public class ChatUserServiceTest {
         Chat chat = new Chat(chatId);
         when(chatRepository.findById(eq(chatId))).thenReturn(Optional.of(chat));
         assertFalse(chatUserService.addUserChatIfAbsent(username, chatId));
+    }
+
+    /**
+     * Тест на {@link ChatUserService#setNotificationTime(String, OffsetTime)}. Время успешно устанавливется,
+     * если пользователь существует. Иначе проверяется исключение.
+     */
+    @Test
+    public void setTimeTest() {
+        String username = "username";
+        User user = new User(username);
+        OffsetTime offsetTime = OffsetTime.of(0, 0, 0, 0, ZoneOffset.UTC);
+
+        when(userRepository.findByUserName(eq(username))).thenReturn(Optional.of(user));
+        chatUserService.setNotificationTime(username, offsetTime);
+        assertEquals(user.getScheduledTime(), offsetTime);
+        verify(userRepository).save(eq(user));
+
+        when(userRepository.findByUserName(eq(username))).thenReturn(Optional.empty());
+        Exception e = assertThrows(NoSuchElementException.class, () -> chatUserService.setNotificationTime(username, offsetTime));
+        assertEquals("user username not found in DB", e.getMessage());
     }
 }

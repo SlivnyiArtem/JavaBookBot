@@ -23,8 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @WireMockTest(httpPort = 8080)
 public class GoogleBooksApiClientTest {
 
-    private final BotProperties botProperties = new BotProperties("", "", 
-            "", "http://localhost:8080");
+    private final BotProperties.BookApi botProperties = new BotProperties.BookApi("1", "http://localhost:8080");
     
     private final GoogleBooksApiClient googleBooksApiClient = new GoogleBooksApiClient(botProperties);
 

@@ -68,15 +68,15 @@ public class Book {
     @Id
     private Long isbn;
 
-    private String title;
+    private String title = "";
 
-    private String description;
+    private String description = "";
 
-    private String authors;
+    private String authors = "";
 
-    private String publisher;
+    private String publisher = "";
 
-    private LocalDate publishedDate;
+    private LocalDate publishedDate = LocalDate.of(2000, 1,1);
 
     @ManyToMany
     @JoinTable(
@@ -123,7 +123,7 @@ public class Book {
             try {
                 this.title = trimValue((String) volumeInfo.get("title"));
             } catch (ClassCastException | NoSuchElementException e) {
-                logger.warn(e.getMessage());
+                logger.warn("can't parse title: {}", e.getMessage());
             }
         }
 
@@ -131,7 +131,7 @@ public class Book {
             try {
                 this.description = trimValue((String) volumeInfo.get("description"));
             } catch (ClassCastException | NoSuchElementException e) {
-                logger.warn("can't parse description", e);
+                logger.warn("can't parse description: {}", e.getMessage());
             }
         }
 
@@ -142,7 +142,7 @@ public class Book {
                         .map(obj -> (String) obj)
                         .collect(Collectors.joining(", ")));
             } catch (ClassCastException | NoSuchElementException e) {
-                logger.warn("can't parse authors list", e);
+                logger.warn("can't parse authors list: {}", e.getMessage());
             }
         }
 
@@ -150,7 +150,7 @@ public class Book {
             try {
                 this.publisher = trimValue((String) volumeInfo.get("publisher"));
             } catch (ClassCastException | NoSuchElementException e) {
-                logger.warn("can't parse publisher", e);
+                logger.warn("can't parse publisher: {}", e.getMessage());
             }
         }
 
@@ -158,7 +158,7 @@ public class Book {
             try {
                 this.publishedDate = LocalDate.parse((String) volumeInfo.get("publishedDate"));
             } catch (ClassCastException | NoSuchElementException | DateTimeParseException e) {
-                logger.warn("can't parse published date", e);
+                logger.warn("can't parse published date: {}", e.getMessage());
             }
         }
     }

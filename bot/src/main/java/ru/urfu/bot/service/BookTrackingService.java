@@ -2,15 +2,16 @@ package ru.urfu.bot.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.urfu.bot.client.GoogleBooksApiClient;
 import ru.urfu.bot.domain.Book;
 import ru.urfu.bot.domain.User;
 import ru.urfu.bot.repository.JpaBookRepository;
 import ru.urfu.bot.repository.JpaUserRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 /**
  * Сервис отвечает за операции, связанные с отслеживанием книг пользователями.
@@ -43,7 +44,6 @@ public class BookTrackingService {
      * @throws NoSuchElementException если книга не найдена ни в базе данных, ни в API;
      * если пользователь не найден в базе данных
      */
-    @Transactional
     public void trackBook(Long isbn, String username) throws NoSuchElementException {
 
         Book book = bookRepository.findById(isbn)
@@ -67,7 +67,6 @@ public class BookTrackingService {
      * @throws NoSuchElementException если книга не найдена в базе данных;
      * если пользователь не найден в базе данных
      */
-    @Transactional
     public void untrackBook(Long isbn, String username) throws NoSuchElementException {
 
         User user = userRepository.findByUserName(username)
@@ -93,7 +92,6 @@ public class BookTrackingService {
      * @return книга
      * @throws NoSuchElementException если книга не найдена ни в базе данных, ни в API
      */
-    @Transactional
     public Book getBook(Long isbn) throws NoSuchElementException {
         return bookRepository.findById(isbn)
                 .or(() -> booksApiClient.findBookByIsbn(isbn))
@@ -114,8 +112,44 @@ public class BookTrackingService {
      * @param username имя пользователя
      * @return список книг
      */
-    @Transactional
     public List<Book> getUserBooks(String username) {
         return bookRepository.findAllByUsers_UserName(username);
+    }
+
+    /**
+     * Получает книги, вышедшие в указанную дату
+     * @param publishedDate дата выхода
+     * @return список книг
+     */
+    public List<Book> getReleasedBook(LocalDate publishedDate) {
+        return bookRepository.findAll().stream()
+                .filter(book -> book.getPublishedDate() != null
+                        && book.getPublishedDate().equals(publishedDate))
+                .toList();
+    }
+
+    /**
+     * Получает книги и обновляет книги, информация о которых изменилась с момента
+     * последнего обновления
+     * @return список книг
+     */
+    public List<Book> getUpdatedBook() {
+        return bookRepository.findAll().stream()
+                .filter(book -> {
+                    Optional<Book> optionalBook = booksApiClient.findBookByIsbn(book.getIsbn());
+                    if (optionalBook.isPresent()) {
+                        Book book1 = optionalBook.get();
+                        if (!(book1.getTitle().equals(book.getTitle())
+                                && book1.getDescription().equals(book.getDescription())
+                                && book1.getAuthors().equals(book.getAuthors())
+                                && book1.getPublisher().equals(book.getPublisher())
+                                && book1.getPublishedDate().equals(book.getPublishedDate()))) {
+                            bookRepository.save(book1);
+                            return true;
+                        }
+                    }
+                    return false;
+                })
+                .toList();
     }
 }
