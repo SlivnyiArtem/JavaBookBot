@@ -9,7 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.urfu.bot.domain.Book;
-import ru.urfu.bot.handler.commands.PrintBooksCommandHandler;
+import ru.urfu.bot.command.PrintBooksCommand;
 import ru.urfu.bot.service.BookTrackingService;
 
 import java.time.LocalDate;
@@ -20,7 +20,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 /**
- * Тест на класс {@link PrintBooksCommandHandler}
+ * Тест на класс {@link PrintBooksCommand}
  */
 @ExtendWith(MockitoExtension.class)
 public class PrintBooksCommandTest {
@@ -29,7 +29,7 @@ public class PrintBooksCommandTest {
     private BookTrackingService bookTrackingService;
 
     @InjectMocks
-    private PrintBooksCommandHandler printBooksCommandHandler;
+    private PrintBooksCommand printBooksCommand;
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private Update update;
@@ -66,8 +66,8 @@ public class PrintBooksCommandTest {
         String message = "ISBN: %d\nНазвание: %s\nАвторы: %s\nДата издания: %s".formatted(
                 isbn, title, author, publishedDate
         );
-        assertTrue(printBooksCommandHandler.canHandle(update));
-        List<SendMessage> actual = printBooksCommandHandler.process(update);
+        assertTrue(printBooksCommand.canHandle(update));
+        List<SendMessage> actual = printBooksCommand.process(update);
         assertEquals(message, actual.getFirst().getText());
     }
 
@@ -84,8 +84,8 @@ public class PrintBooksCommandTest {
 
         when(bookTrackingService.getUserBooks(eq(username))).thenReturn(List.of());
 
-        assertTrue(printBooksCommandHandler.canHandle(update));
-        List<SendMessage> actual = printBooksCommandHandler.process(update);
+        assertTrue(printBooksCommand.canHandle(update));
+        List<SendMessage> actual = printBooksCommand.process(update);
         assertEquals(List.of(new SendMessage(chatId.toString(), "Книги не найдены")), actual);
     }
 
@@ -100,8 +100,8 @@ public class PrintBooksCommandTest {
         when(update.getMessage().getChat().getId()).thenReturn(chatId);
         when(update.getMessage().getChat().getUserName()).thenReturn(username);
 
-        assertFalse(printBooksCommandHandler.canHandle(update));
-        List<SendMessage> actual = printBooksCommandHandler.process(update);
+        assertFalse(printBooksCommand.canHandle(update));
+        List<SendMessage> actual = printBooksCommand.process(update);
         assertTrue(actual.isEmpty());
     }
 
@@ -112,8 +112,8 @@ public class PrintBooksCommandTest {
     public void notCommandUpdateTest() {
         when(update.hasMessage()).thenReturn(false);
 
-        assertFalse(printBooksCommandHandler.canHandle(update));
-        List<SendMessage> actual = printBooksCommandHandler.process(update);
+        assertFalse(printBooksCommand.canHandle(update));
+        List<SendMessage> actual = printBooksCommand.process(update);
         assertTrue(actual.isEmpty());
     }
 
@@ -128,8 +128,8 @@ public class PrintBooksCommandTest {
         when(update.getMessage().getChat().getId()).thenReturn(null);
         when(update.getMessage().getChat().getUserName()).thenReturn("");
 
-        assertFalse(printBooksCommandHandler.canHandle(update));
-        List<SendMessage> actual = printBooksCommandHandler.process(update);
+        assertFalse(printBooksCommand.canHandle(update));
+        List<SendMessage> actual = printBooksCommand.process(update);
         assertTrue(actual.isEmpty());
     }
 
@@ -143,8 +143,8 @@ public class PrintBooksCommandTest {
         when(update.getMessage().getText()).thenReturn(null);
         when(update.getMessage().getChat()).thenReturn(null);
 
-        assertFalse(printBooksCommandHandler.canHandle(update));
-        List<SendMessage> actual = printBooksCommandHandler.process(update);
+        assertFalse(printBooksCommand.canHandle(update));
+        List<SendMessage> actual = printBooksCommand.process(update);
         assertTrue(actual.isEmpty());
     }
 }

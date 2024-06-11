@@ -11,7 +11,6 @@ import ru.urfu.bot.domain.Book;
 import ru.urfu.bot.domain.Chat;
 import ru.urfu.bot.domain.User;
 import ru.urfu.bot.service.BookTrackingService;
-import ru.urfu.bot.utils.SendScheduledMessage;
 
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -39,7 +38,7 @@ public class BookWorkerTest {
     @BeforeEach
     public void init() {
         sendQueue = new LinkedBlockingQueue<>();
-        bookWorker = new BookWorker(bookTrackingService, sendQueue);
+        bookWorker = new BookWorker(bookTrackingService);
         Chat chat1 = new Chat(1L);
         Chat chat2 = new Chat(2L);
         Chat chat3 = new Chat(3L);

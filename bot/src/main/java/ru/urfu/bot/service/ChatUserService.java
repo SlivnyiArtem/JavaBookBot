@@ -2,6 +2,7 @@ package ru.urfu.bot.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.urfu.bot.domain.Chat;
 import ru.urfu.bot.domain.User;
 import ru.urfu.bot.repository.JpaChatRepository;
@@ -34,6 +35,7 @@ public class ChatUserService {
      * @param chatId ID чата
      * @return true, если чат сохранен; false, если чат и пользователь уже существуют
      */
+    @Transactional
     public boolean addUserChatIfAbsent(String username, Long chatId) {
         if (chatRepository.findById(chatId).isEmpty()) {
             User user = userRepository.findByUserName(username).orElse(new User(username));
@@ -54,6 +56,7 @@ public class ChatUserService {
      * @param username имя пользователя
      * @param offsetTime врямя уведомления
      */
+    @Transactional
     public void setNotificationTime(String username, OffsetTime offsetTime) throws NoSuchElementException {
         User user = userRepository.findByUserName(username)
                 .orElseThrow(() -> new NoSuchElementException(USER_NOT_FOUND_MSG.formatted(username)));

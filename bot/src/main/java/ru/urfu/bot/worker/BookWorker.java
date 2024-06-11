@@ -5,16 +5,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethodMessage;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import ru.urfu.bot.domain.Book;
+import org.telegram.telegrambots.abilitybots.api.bot.BaseAbilityBot;
+import org.telegram.telegrambots.meta.api.objects.User;
 import ru.urfu.bot.service.BookTrackingService;
 import ru.urfu.bot.utils.MessageConst;
-import ru.urfu.bot.utils.SendScheduledMessage;
 
 import java.time.LocalDate;
-import java.time.OffsetTime;
-import java.util.concurrent.BlockingQueue;
+import java.util.Timer;
+import java.util.Date;
+import java.util.TimerTask;
 
 /**
  * Воркер переодически в отдельных потоках независимо выполняет две задачи:
@@ -28,14 +27,14 @@ public class BookWorker {
 
     private final Logger logger = LoggerFactory.getLogger(BookWorker.class);
 
-    private final BlockingQueue<BotApiMethodMessage> sendQueue;
-
-    public BookWorker(BookTrackingService bookTrackingService, BlockingQueue<BotApiMethodMessage> sendQueue) {
-        this.bookTrackingService = bookTrackingService;
-        this.sendQueue = sendQueue;
-    }
-
     private final BookTrackingService bookTrackingService;
+
+    private final BaseAbilityBot abilityBot;
+
+    public BookWorker(BookTrackingService bookTrackingService, BaseAbilityBot abilityBot) {
+        this.bookTrackingService = bookTrackingService;
+        this.abilityBot = abilityBot;
+    }
 
     /**
      * Переодически отправляет сообщения подписчикам книги, если она вышла
@@ -44,27 +43,18 @@ public class BookWorker {
     @Transactional
     public void checkReleaseDate() {
         logger.trace("check if book released");
-        bookTrackingService.getReleasedBook(LocalDate.now()).stream()
-                .flatMap(book -> book.getUsers().stream()
-                        .flatMap(user -> user.getChats().stream()
-                                .map(chat ->
-                                        getReleaseMessage(chat.getId().toString(), user.getScheduledTime(), book))))
-                .forEach(message -> {
-                    try {
-                        sendQueue.put(message);
-                    } catch (InterruptedException e) {
-                        logger.error(e.getMessage());
-                    }
-                });
-    }
-
-    private BotApiMethodMessage getReleaseMessage(String chatId, OffsetTime scheduledTime, Book book) {
-        SendMessage sendMessage = new SendMessage(chatId,
-                MessageConst.BOOK_RELEASE.formatted(book.getTitle(), book.getIsbn()));
-        return new SendScheduledMessage(
-                sendMessage,
-                scheduledTime.atDate(LocalDate.now(scheduledTime.getOffset()))
-        );
+        bookTrackingService.getReleasedBook(LocalDate.now())
+                .forEach(book -> book.getUsers()
+                        .forEach(user -> user.getChats()
+                                .forEach(chat -> {
+                                    new Timer().schedule(new TimerTask() {
+                                        @Override
+                                        public void run() {
+                                            String message = MessageConst.BOOK_RELEASED_MESSAGE.formatted(book.getTitle(), book.getIsbn());
+                                            abilityBot.getSilent().send(message, chat.getId());
+                                        }
+                                    }, new Date(user.getScheduledTime().toEpochSecond(LocalDate.now())));
+                                })));
     }
 
     /**
@@ -75,26 +65,17 @@ public class BookWorker {
     @Transactional
     public void checkUpdateInfo() {
         logger.trace("check if book info updated");
-        bookTrackingService.getUpdatedBook().stream()
-                .flatMap(book -> book.getUsers().stream()
-                        .flatMap(user -> user.getChats().stream()
-                                .map(chat ->
-                                        getUpdateInfoMessage(chat.getId().toString(), user.getScheduledTime(), book))))
-                .forEach(message -> {
-                    try {
-                        sendQueue.put(message);
-                    } catch (InterruptedException e) {
-                        logger.error(e.getMessage());
-                    }
-                });
-    }
-
-    private BotApiMethodMessage getUpdateInfoMessage(String chatId, OffsetTime scheduledTime, Book book) {
-        SendMessage sendMessage = new SendMessage(chatId,
-                MessageConst.BOOK_UPDATE_INFO.formatted(book.getTitle(), book.getIsbn()));
-        return new SendScheduledMessage(
-                sendMessage,
-                scheduledTime.atDate(LocalDate.now(scheduledTime.getOffset()))
-        );
+        bookTrackingService.getUpdatedBook()
+                .forEach(book -> book.getUsers()
+                        .forEach(user -> user.getChats()
+                                .forEach(chat -> {
+                                    new Timer().schedule(new TimerTask() {
+                                        @Override
+                                        public void run() {
+                                            String message = MessageConst.BOOK_UPDATED_MESSAGE.formatted(book.getTitle(), book.getIsbn());
+                                            abilityBot.getSilent().send(message, chat.getId());
+                                        }
+                                    }, new Date(user.getScheduledTime().toEpochSecond(LocalDate.now())));
+                                })));
     }
 }

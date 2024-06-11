@@ -1,47 +1,55 @@
 package ru.urfu.bot.utils;
 
+import java.util.Map;
+
 /**
  * Список текстовых констант для ответных сообщений, коллбэков и т.д.
  */
-public class MessageConst {
+public final class MessageConst {
 
-    public static final String ADD_BOOK = "Книга добавлена в избранное";
+    private MessageConst() {
 
-    public static final String REMOVE_BOOK = "Книга удалена из избранных";
+    }
 
-    public static final String BOOK_INFO = "ISBN: %d\nНазвание: %s\nОписание: %s\nАвторы: %s\nИздатель: %s\nДата издания: %s";
+    public static final String BOOK_INFO_LONG = "ISBN: %d\ntitle: %s\nDescription: %s\nAuthors: %s\nPublisher: %s\nPublished date: %s";
 
-    public static final String BOOK_INFO_SHORT = "ISBN: %d\nНазвание: %s\nАвторы: %s\nДата издания: %s";
+    public static final String BOOK_INFO_SHORT = "ISBN: %d\nTitle: %s\nAuthors: %s\nPublished date: %s";
 
-    public static final String ADD_BUTTON_CALLBACK = "/add_book %d";
+    public static final String ADD_BUTTON_CALLBACK = "add_book";
 
-    public static final String REMOVE_BUTTON_CALLBACK = "/remove_book %d";
+    public static final String REMOVE_BUTTON_CALLBACK = "remove_book";
 
-    public static final String INFO_BUTTON_CALLBACK = "/book_inf %d";
+    public static final String INFO_BUTTON_CALLBACK = "book_info";
 
-    public static final String ADD_BUTTON_TEXT = "Добавить книгу в избранное";
+    public static final String ADD_BUTTON_TEXT = "Add book";
 
-    public static final String REMOVE_BUTTON_TEXT = "Удалить книгу из избранного";
+    public static final String REMOVE_BUTTON_TEXT = "Remove book";
 
-    public static final String INFO_BUTTON_TEXT = "Показать дополнительную информацию";
+    public static final String INFO_BUTTON_TEXT = "Show more info";
 
-    public static final String UNKNOWN_COMMAND = "Неизвестная команда. Введите /help для получения списка команд";
+    public static final Map<String, String> COMMANDS = Map.of(
+            "start", "start conversation",
+            "search", "search book by title in external API",
+            "my_books", "print user's tracking book",
+            "set_time", "set time when receiving notification",
+            "help", "get bot commands"
+    );
 
-    public static final String HELP = """
-                /start - начать работать с ботом
-                /search {title} - поиск книги по названию
-                /my_books - вывести список книг
-                /set_time {time} - установить время для получения уведомлений (например '10:15+01:00' или '10:15:30+01:00')
-                /help - помощь
-                """;
+    public static final String INTERNAL_SERVER_ERROR_MESSAGE = "Internal server error";
 
-    public static final String INTERNAL_SERVER_ERROR = "Внутренняя ошибка сервера";
+    public static final String UNKNOWN_COMMAND_MESSAGE = "Unknown command. Type /help to get list of commands";
 
-    public static final String EMPTY_LIST = "Книги не найдены";
+    public static final String EMPTY_LIST = "Books not found";
 
-    public static final String BOOK_RELEASE = "Книга %s (isbn: %d) вышла";
+    public static final String SEARCH_BOOK_MESSAGE = "Enter book title:";
 
-    public static final String BOOK_UPDATE_INFO = "Информация о книге %s (isbn: %d) обновленна";
+    public static final String BOOK_RELEASED_MESSAGE = "Book '%s' (isbn: %d) has released";
 
-    public static final String SET_SCHEDULED_TIME = "Установленно время для получения уведомлений";
+    public static final String BOOK_UPDATED_MESSAGE = "Book info '%s' (isbn: %d) has updated";
+
+    public static final String SET_SCHEDULED_TIME_MESSAGE = "The time for receiving notifications is set";
+
+    public static final String BOOK_ADDED_MESSAGE = "Book saved to collection";
+
+    public static final String BOOK_REMOVED_MESSAGE = "Book removed from collection";
 }

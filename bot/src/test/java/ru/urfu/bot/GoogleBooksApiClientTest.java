@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import org.junit.jupiter.api.Test;
-import ru.urfu.bot.client.GoogleBooksApiClient;
+import ru.urfu.bot.extern.client.GoogleBooksApiClient;
 import ru.urfu.bot.config.BotProperties;
 import ru.urfu.bot.domain.Book;
 
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Тест на класс {@link ru.urfu.bot.client.GoogleBooksApiClient}. Используетя wiremock для мока API
+ * Тест на класс {@link GoogleBooksApiClient}. Используетя wiremock для мока API
  */
 @WireMockTest(httpPort = 8080)
 public class GoogleBooksApiClientTest {

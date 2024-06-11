@@ -1,12 +1,16 @@
 spring:
   profiles:
-    active: debug    # поменять чтобы сменить профиль
+    active: develop
   application:
     name: bot
-  task:
-    scheduling:
-      pool:
-        size: 100    # кол-во доступных потоков
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: bot
+      username: mongo
+      password: mongo
+      authentication-database: admin
 
 server:
   port: 8080
@@ -15,14 +19,13 @@ app:
   telegram:
     token: ${TOKEN}
     bot-name: book_tracker_bot
+    creator-id: ${AUTHOR}
   book-api:
     api-key: ${API_KEY}
     base-url: https://www.googleapis.com/books/v1
   scheduler:
     update-info-delay: 5d
     check-release-delay: 1d
-    received-process-delay: 500ms
-    send-delay: 500ms
 
 logging:
   config: classpath:log4j2-plain.xml

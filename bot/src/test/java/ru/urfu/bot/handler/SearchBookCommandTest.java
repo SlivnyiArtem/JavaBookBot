@@ -9,7 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.urfu.bot.domain.Book;
-import ru.urfu.bot.handler.commands.SearchBookCommandHandler;
+import ru.urfu.bot.command.SearchBookCommand;
 import ru.urfu.bot.service.BookTrackingService;
 
 import java.time.LocalDate;
@@ -20,16 +20,16 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 /**
- * Тест на класс {@link SearchBookCommandHandler}
+ * Тест на класс {@link SearchBookCommand}
  */
 @ExtendWith(MockitoExtension.class)
-public class SearchBookCommandHandlerTest {
+public class SearchBookCommandTest {
 
     @Mock
     private BookTrackingService bookTrackingService;
 
     @InjectMocks
-    private SearchBookCommandHandler searchBookCommandHandler;
+    private SearchBookCommand searchBookCommand;
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private Update update;
@@ -66,8 +66,8 @@ public class SearchBookCommandHandlerTest {
         String message = "ISBN: %d\nНазвание: %s\nАвторы: %s\nДата издания: %s".formatted(
                 isbn, title, author, publishedDate
         );
-        assertTrue(searchBookCommandHandler.canHandle(update));
-        List<SendMessage> actual = searchBookCommandHandler.process(update);
+        assertTrue(searchBookCommand.canHandle(update));
+        List<SendMessage> actual = searchBookCommand.process(update);
         assertEquals(message, actual.getFirst().getText());
     }
 
@@ -84,8 +84,8 @@ public class SearchBookCommandHandlerTest {
 
         when(bookTrackingService.getBooksByTitle(eq(title))).thenReturn(List.of());
 
-        assertTrue(searchBookCommandHandler.canHandle(update));
-        List<SendMessage> actual = searchBookCommandHandler.process(update);
+        assertTrue(searchBookCommand.canHandle(update));
+        List<SendMessage> actual = searchBookCommand.process(update);
         assertEquals(List.of(new SendMessage(chatId.toString(), "Книги не найдены")), actual);
     }
 
@@ -100,8 +100,8 @@ public class SearchBookCommandHandlerTest {
         when(update.getMessage().getChat().getId()).thenReturn(chatId);
         when(update.getMessage().getChat().getUserName()).thenReturn(username);
 
-        assertFalse(searchBookCommandHandler.canHandle(update));
-        List<SendMessage> actual = searchBookCommandHandler.process(update);
+        assertFalse(searchBookCommand.canHandle(update));
+        List<SendMessage> actual = searchBookCommand.process(update);
         assertTrue(actual.isEmpty());
     }
 
@@ -112,8 +112,8 @@ public class SearchBookCommandHandlerTest {
     public void notCommandUpdateTest() {
         when(update.hasMessage()).thenReturn(false);
 
-        assertFalse(searchBookCommandHandler.canHandle(update));
-        List<SendMessage> actual = searchBookCommandHandler.process(update);
+        assertFalse(searchBookCommand.canHandle(update));
+        List<SendMessage> actual = searchBookCommand.process(update);
         assertTrue(actual.isEmpty());
     }
 
@@ -128,8 +128,8 @@ public class SearchBookCommandHandlerTest {
         when(update.getMessage().getChat().getId()).thenReturn(null);
         when(update.getMessage().getChat().getUserName()).thenReturn("");
 
-        assertFalse(searchBookCommandHandler.canHandle(update));
-        List<SendMessage> actual = searchBookCommandHandler.process(update);
+        assertFalse(searchBookCommand.canHandle(update));
+        List<SendMessage> actual = searchBookCommand.process(update);
         assertTrue(actual.isEmpty());
     }
 
@@ -143,8 +143,8 @@ public class SearchBookCommandHandlerTest {
         when(update.getMessage().getText()).thenReturn(null);
         when(update.getMessage().getChat()).thenReturn(null);
 
-        assertFalse(searchBookCommandHandler.canHandle(update));
-        List<SendMessage> actual = searchBookCommandHandler.process(update);
+        assertFalse(searchBookCommand.canHandle(update));
+        List<SendMessage> actual = searchBookCommand.process(update);
         assertTrue(actual.isEmpty());
     }
 }

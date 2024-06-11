@@ -10,8 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethodMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import ru.urfu.bot.bot.Bot;
-import ru.urfu.bot.utils.SendScheduledMessage;
+import ru.urfu.bot.bot.BookTrackingBot;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -33,7 +32,7 @@ public class SendMessageWorkerTest {
     private BlockingQueue<BotApiMethodMessage> sendQueue;
 
     @Mock
-    private Bot bot;
+    private BookTrackingBot bookTrackingBot;
 
     private SendMessageWorker sendMessageWorker;
 
@@ -43,7 +42,7 @@ public class SendMessageWorkerTest {
     @BeforeEach
     public void init() {
         sendQueue = new LinkedBlockingQueue<>();
-        sendMessageWorker = new SendMessageWorker(sendQueue, bot);
+        sendMessageWorker = new SendMessageWorker(sendQueue, bookTrackingBot);
     }
 
     /**
@@ -63,7 +62,7 @@ public class SendMessageWorkerTest {
             offsetDateTime.when(OffsetDateTime::now).thenReturn(scheduledTime.plusSeconds(10L));
             sendQueue.put(sendScheduledMessage);
             sendMessageWorker.sendMessage();
-            verify(bot, only()).execute(eq(sendScheduledMessage));
+            verify(bookTrackingBot, only()).execute(eq(sendScheduledMessage));
             assertTrue(sendQueue.isEmpty());
 
             offsetDateTime.when(OffsetDateTime::now).thenReturn(scheduledTime.minusSeconds(10L));
@@ -74,7 +73,7 @@ public class SendMessageWorkerTest {
 
         sendQueue.put(sendMessage);
         sendMessageWorker.sendMessage();
-        verify(bot).execute(eq(sendMessage));
+        verify(bookTrackingBot).execute(eq(sendMessage));
         assertTrue(sendQueue.isEmpty());
     }
 }

@@ -1,15 +1,23 @@
-package ru.urfu.bot.client;
+package ru.urfu.bot.extern.client;
 
+import jakarta.annotation.Nonnull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.urfu.bot.config.BotProperties;
 import ru.urfu.bot.domain.Book;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
+
+import static java.lang.Boolean.TRUE;
 
 /**
  * Клиент, предназначенный для взаимодействия с Google Books API
@@ -18,7 +26,10 @@ import java.util.Optional;
 public class GoogleBooksApiClient {
 
     private final String apiKey;
+
     private final WebClient webClient;
+
+    private static final int MAX_RESPONSE_SIZE = 5;
 
     @Autowired
     public GoogleBooksApiClient(BotProperties.BookApi bookApiProperties) {
@@ -30,23 +41,17 @@ public class GoogleBooksApiClient {
      * Возвращает список книг, найденных через API. Ищет по названию книги
      */
     public List<Book> findBooksByTitle(String name) {
-        BookList bookList = webClient.get()
+        return webClient.get()
                 .uri("/volumes?q={name}", name)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, response -> Mono.empty())
                 .bodyToMono(BookList.class)
-                .block();
-
-        if (bookList == null || bookList.getTotalItems() == null || bookList.getTotalItems() == 0) {
-            return List.of();
-        }
-        return bookList
-                .getItems()
-                .stream()
-                .filter(book -> book.getIsbn() != null)
-                // этот фильтр замедляет вывод; нужен потому, что некоторые книги нельзя найти по ISBN
-                .filter(book -> findBookByIsbn(book.getIsbn()).isPresent())
-                .limit(5)
+                .blockOptional()
+                .filter(bookList -> bookList.getTotalItems() != null && bookList.getTotalItems() > 0)
+                .map(BookList::getItems)
+                .orElse(List.of()).stream()
+                .filter(book -> book.getIsbn() != null && findBookByIsbn(book.getIsbn()).isPresent())
+                .limit(MAX_RESPONSE_SIZE)
                 .toList();
     }
 
@@ -54,25 +59,21 @@ public class GoogleBooksApiClient {
      * Находит и возвращает книгу, по ISBN коду
      */
     public Optional<Book> findBookByIsbn(Long isbn) {
-        BookList bookList = webClient.get()
+        return webClient.get()
                 .uri("/volumes?q=isbn:{isbn}", isbn)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, response -> Mono.empty())
                 .bodyToMono(BookList.class)
-                .block();
-
-        if (bookList == null || bookList.getTotalItems() == null || bookList.getTotalItems() == 0) {
-            return Optional.empty();
-        }
-        return bookList.getItems()
-                .stream()
-                .filter(book1 -> book1.getIsbn() != null)
+                .blockOptional()
+                .filter(bookList -> bookList.getTotalItems() != null && bookList.getTotalItems() > 0)
+                .map(BookList::getItems)
+                .orElse(List.of()).stream()
+                .filter(book -> Objects.equals(book.getIsbn(), isbn))
                 .findFirst();
     }
 
     /**
      * Дто для парсинга JSON ответа из API
-     * <br/><br/>
      */
     private static class BookList {
 

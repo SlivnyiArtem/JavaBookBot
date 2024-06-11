@@ -3,8 +3,6 @@ package ru.urfu.bot;
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethodMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import ru.urfu.bot.utils.QueueProvider;
-import ru.urfu.bot.utils.SendScheduledMessage;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;

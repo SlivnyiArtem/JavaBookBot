@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import ru.urfu.bot.handler.callbacks.AddBookCallbackHandler;
+import ru.urfu.bot.command.callback.AddBookCallbackCommand;
 import ru.urfu.bot.service.BookTrackingService;
 
 import java.util.List;
@@ -18,16 +18,16 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Тест на класс {@link AddBookCallbackHandler}
+ * Тест на класс {@link AddBookCallbackCommand}
  */
 @ExtendWith(MockitoExtension.class)
-public class AddBookCallbackHandlerTest {
+public class AddBookCallbackCommandTest {
 
     @Mock
     private BookTrackingService bookTrackingService;
 
     @InjectMocks
-    private AddBookCallbackHandler addBookCallbackHandler;
+    private AddBookCallbackCommand addBookCallbackCommand;
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private Update update;
@@ -50,8 +50,8 @@ public class AddBookCallbackHandlerTest {
         when(update.getCallbackQuery().getMessage().getChatId()).thenReturn(chatId);
         when(update.getCallbackQuery().getFrom().getUserName()).thenReturn(username);
 
-        assertTrue(addBookCallbackHandler.canHandle(update));
-        List<SendMessage> actual = addBookCallbackHandler.process(update);
+        assertTrue(addBookCallbackCommand.canHandle(update));
+        List<SendMessage> actual = addBookCallbackCommand.process(update);
         assertEquals(List.of(new SendMessage(chatId.toString(), "Книга добавлена в избранное")), actual);
         verify(bookTrackingService).trackBook(isbn, username);
     }
@@ -68,8 +68,8 @@ public class AddBookCallbackHandlerTest {
 
         doThrow(NoSuchElementException.class).when(bookTrackingService).trackBook(eq(isbn), eq(username));
 
-        assertTrue(addBookCallbackHandler.canHandle(update));
-        List<SendMessage> actual = addBookCallbackHandler.process(update);
+        assertTrue(addBookCallbackCommand.canHandle(update));
+        List<SendMessage> actual = addBookCallbackCommand.process(update);
         assertEquals(List.of(new SendMessage(chatId.toString(), ERROR_MESSAGE)), actual);
     }
 
@@ -83,8 +83,8 @@ public class AddBookCallbackHandlerTest {
         when(update.getCallbackQuery().getMessage().getChatId()).thenReturn(chatId);
         when(update.getCallbackQuery().getFrom().getUserName()).thenReturn(username);
 
-        assertFalse(addBookCallbackHandler.canHandle(update));
-        List<SendMessage> actual = addBookCallbackHandler.process(update);
+        assertFalse(addBookCallbackCommand.canHandle(update));
+        List<SendMessage> actual = addBookCallbackCommand.process(update);
         assertTrue(actual.isEmpty());
     }
 
@@ -95,8 +95,8 @@ public class AddBookCallbackHandlerTest {
     public void notCallbackUpdateTest() {
         when(update.hasCallbackQuery()).thenReturn(false);
 
-        assertFalse(addBookCallbackHandler.canHandle(update));
-        List<SendMessage> actual = addBookCallbackHandler.process(update);
+        assertFalse(addBookCallbackCommand.canHandle(update));
+        List<SendMessage> actual = addBookCallbackCommand.process(update);
         assertTrue(actual.isEmpty());
     }
 
@@ -110,8 +110,8 @@ public class AddBookCallbackHandlerTest {
         when(update.getCallbackQuery().getMessage().getChatId()).thenReturn(null);
         when(update.getCallbackQuery().getData()).thenReturn("");
 
-        assertFalse(addBookCallbackHandler.canHandle(update));
-        List<SendMessage> actual = addBookCallbackHandler.process(update);
+        assertFalse(addBookCallbackCommand.canHandle(update));
+        List<SendMessage> actual = addBookCallbackCommand.process(update);
         assertTrue(actual.isEmpty());
     }
 
@@ -125,8 +125,8 @@ public class AddBookCallbackHandlerTest {
         when(update.getCallbackQuery().getMessage()).thenReturn(null);
         when(update.getCallbackQuery().getFrom()).thenReturn(null);
 
-        assertFalse(addBookCallbackHandler.canHandle(update));
-        List<SendMessage> actual = addBookCallbackHandler.process(update);
+        assertFalse(addBookCallbackCommand.canHandle(update));
+        List<SendMessage> actual = addBookCallbackCommand.process(update);
         assertTrue(actual.isEmpty());
     }
 }

@@ -1,8 +1,12 @@
 package ru.urfu.bot.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.urfu.bot.client.GoogleBooksApiClient;
+import org.springframework.transaction.annotation.Transactional;
+import ru.urfu.bot.exception.DataNotFoundException;
+import ru.urfu.bot.extern.client.GoogleBooksApiClient;
 import ru.urfu.bot.domain.Book;
 import ru.urfu.bot.domain.User;
 import ru.urfu.bot.repository.JpaBookRepository;
@@ -19,6 +23,26 @@ import java.util.Optional;
 @Service
 public class BookTrackingService {
 
+    private final GoogleBooksApiClient booksApiClient;
+
+    private final JpaBookRepository bookRepository;
+
+    private final JpaUserRepository userRepository;
+
+    private static final String USER_NOT_FOUND_EXCEPTION_MSG = "user '%s' not found in DB";
+
+    private static final String BOOK_NOT_FOUND_EXCEPTION_MSG = "book '%d' not found in DB and API";
+
+    private static final String BOOK_NOT_TRACKED_EXCEPTION_MSG = "user '%s' doesn't track book '%d'";
+
+    private static final String BOOK_TRACKED_BY_USER_LOG_MSG = "user '{}' track book '{}'";
+
+    private static final String BOOK_DELETED_LOG_MSG = "book '{}' deleted";
+
+    private static final String BOOK_UNTRACKED_BY_USER_LOG_MSG = "user '{}' untrack book '{}'";
+
+    private static final Logger log = LoggerFactory.getLogger(BookTrackingService.class);
+
     @Autowired
     public BookTrackingService(GoogleBooksApiClient booksApiClient, JpaBookRepository bookRepository,
                                JpaUserRepository userRepository) {
@@ -27,36 +51,27 @@ public class BookTrackingService {
         this.userRepository = userRepository;
     }
 
-    private final GoogleBooksApiClient booksApiClient;
-
-    private final JpaBookRepository bookRepository;
-
-    private final JpaUserRepository userRepository;
-
-    private static final String USER_NOT_FOUND_MSG = "user %s not found in DB";
-
-    private static final String BOOK_NOT_FOUND_MSG = "book %d not found in DB and API";
-
     /**
      * Добавляет книгу в коллекцию пользователя; сохраняет книгу в базу данных, если та ещё не добавлена
      * @param isbn код книги
      * @param username имя пользователя
-     * @throws NoSuchElementException если книга не найдена ни в базе данных, ни в API;
+     * @throws DataNotFoundException если книга не найдена ни в базе данных, ни в API;
      * если пользователь не найден в базе данных
      */
-    public void trackBook(Long isbn, String username) throws NoSuchElementException {
-
+    @Transactional
+    public void trackBook(Long isbn, String username) throws DataNotFoundException {
         Book book = bookRepository.findById(isbn)
                 .or(() -> booksApiClient.findBookByIsbn(isbn))
-                .orElseThrow(() -> new NoSuchElementException(BOOK_NOT_FOUND_MSG.formatted(isbn)));
+                .orElseThrow(() -> new DataNotFoundException(BOOK_NOT_FOUND_EXCEPTION_MSG.formatted(isbn)));
         User user = userRepository.findByUserName(username)
-                .orElseThrow(() -> new NoSuchElementException(USER_NOT_FOUND_MSG.formatted(username)));
+                .orElseThrow(() -> new DataNotFoundException(USER_NOT_FOUND_EXCEPTION_MSG.formatted(username)));
 
         user.getBooks().add(book);
         book.getUsers().add(user);
 
         bookRepository.save(book);
         userRepository.save(user);
+        log.info(BOOK_TRACKED_BY_USER_LOG_MSG, username, isbn);
     }
 
     /**
@@ -64,38 +79,40 @@ public class BookTrackingService {
      * то полностью удаляет её из базы данных.
      * @param isbn код книги
      * @param username имя пользователя
-     * @throws NoSuchElementException если книга не найдена в базе данных;
+     * @throws DataNotFoundException если книга не найдена в базе данных;
      * если пользователь не найден в базе данных
      */
+    @Transactional
     public void untrackBook(Long isbn, String username) throws NoSuchElementException {
-
         User user = userRepository.findByUserName(username)
-                .orElseThrow(() -> new NoSuchElementException(USER_NOT_FOUND_MSG.formatted(username)));
+                .orElseThrow(() -> new DataNotFoundException(USER_NOT_FOUND_EXCEPTION_MSG.formatted(username)));
         Book book = bookRepository.findByIsbnAndUsers_UserName(isbn, username)
-                .orElseThrow(() -> new NoSuchElementException("book %d not found in DB or user %s doesn't track book"
-                        .formatted(isbn, username)));
+                .orElseThrow(() -> new DataNotFoundException(BOOK_NOT_TRACKED_EXCEPTION_MSG.formatted(username, isbn)));
 
         book.getUsers().remove(user);
         user.getBooks().remove(book);
 
         if (book.getUsers().isEmpty()) {
             bookRepository.delete(book);
+            log.info(BOOK_DELETED_LOG_MSG, isbn);
         } else {
             bookRepository.save(book);
         }
         userRepository.save(user);
+        log.info(BOOK_UNTRACKED_BY_USER_LOG_MSG, username, isbn);
     }
 
     /**
      * Получает книгу из базы данных либо из внешнего API.
      * @param isbn код книги
      * @return книга
-     * @throws NoSuchElementException если книга не найдена ни в базе данных, ни в API
+     * @throws DataNotFoundException если книга не найдена ни в базе данных, ни в API
      */
-    public Book getBook(Long isbn) throws NoSuchElementException {
+    @Transactional
+    public Book getBook(Long isbn) throws DataNotFoundException {
         return bookRepository.findById(isbn)
                 .or(() -> booksApiClient.findBookByIsbn(isbn))
-                .orElseThrow(() -> new NoSuchElementException(BOOK_NOT_FOUND_MSG.formatted(isbn)));
+                .orElseThrow(() -> new DataNotFoundException(BOOK_NOT_FOUND_EXCEPTION_MSG.formatted(isbn)));
     }
 
     /**
@@ -112,6 +129,7 @@ public class BookTrackingService {
      * @param username имя пользователя
      * @return список книг
      */
+    @Transactional
     public List<Book> getUserBooks(String username) {
         return bookRepository.findAllByUsers_UserName(username);
     }
@@ -121,11 +139,9 @@ public class BookTrackingService {
      * @param publishedDate дата выхода
      * @return список книг
      */
+    @Transactional
     public List<Book> getReleasedBook(LocalDate publishedDate) {
-        return bookRepository.findAll().stream()
-                .filter(book -> book.getPublishedDate() != null
-                        && book.getPublishedDate().equals(publishedDate))
-                .toList();
+        return bookRepository.findAllReleasedBooks(publishedDate);
     }
 
     /**
@@ -133,25 +149,14 @@ public class BookTrackingService {
      * последнего обновления
      * @return список книг
      */
+    @Transactional
     public List<Book> getUpdatedBook() {
         return bookRepository.findAll().stream()
                 .filter(book -> {
-                    Optional<Book> optionalBook = booksApiClient.findBookByIsbn(book.getIsbn());
-                    if (optionalBook.isPresent()) {
-                        Book book1 = optionalBook.get();
-                        if (!(book1.getTitle().equals(book.getTitle())
-                                && book1.getDescription().equals(book.getDescription())
-                                && book1.getAuthors().equals(book.getAuthors())
-                                && book1.getPublisher().equals(book.getPublisher())
-                                && book1.getPublishedDate().equals(book.getPublishedDate()))) {
-                            book.setTitle(book1.getTitle());
-                            book.setDescription(book1.getDescription());
-                            book.setAuthors(book1.getAuthors());
-                            book.setPublisher(book1.getPublisher());
-                            book.setPublishedDate(book1.getPublishedDate());
-                            bookRepository.save(book);
-                            return true;
-                        }
+                    Optional<Book> newBook = booksApiClient.findBookByIsbn(book.getIsbn());
+                    if (newBook.isPresent() && !book.equals(newBook.get())) {
+                        bookRepository.save(newBook.get());
+                        return true;
                     }
                     return false;
                 })

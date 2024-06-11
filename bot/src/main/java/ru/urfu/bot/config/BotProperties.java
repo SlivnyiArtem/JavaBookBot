@@ -29,8 +29,10 @@ public record BotProperties(
         /**
          * @param token токен
          * @param botName имя
+         * @param creatorId id пользователя
          */
-        public record Telegram(@NotBlank String token, @NotBlank String botName) {
+        public record Telegram(@NotBlank String token, @NotBlank String botName, @NotNull Long creatorId) {
+
         }
 
         /**
@@ -48,5 +50,6 @@ public record BotProperties(
          * @param baseUrl хост
          */
         public record BookApi(@NotBlank String apiKey, @NotBlank String baseUrl) {
+
         }
 }

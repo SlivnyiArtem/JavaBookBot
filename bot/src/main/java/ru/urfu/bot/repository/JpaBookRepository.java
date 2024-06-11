@@ -1,11 +1,15 @@
 package ru.urfu.bot.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 import ru.urfu.bot.domain.Book;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Репозиторий базы данных для сохраненных книг
@@ -27,4 +31,7 @@ public interface JpaBookRepository extends JpaRepository<Book, Long> {
      * @return список книг
      */
     List<Book> findAllByUsers_UserName(String username);
+
+    @Query("select b from Book b where b.publishedDate >= ?1")
+    List<Book> findAllReleasedBooks(LocalDate publishedDate);
 }

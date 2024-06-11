@@ -17,6 +17,19 @@ import java.util.stream.Collectors;
 @Table(name = "BOOK")
 public class Book {
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Book book = (Book) o;
+        return Objects.equals(isbn, book.isbn) && Objects.equals(title, book.title) && Objects.equals(description, book.description) && Objects.equals(authors, book.authors) && Objects.equals(publisher, book.publisher) && Objects.equals(publishedDate, book.publishedDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(isbn, title, description, authors, publisher, publishedDate);
+    }
+
     public void setIsbn(Long isbn) {
         this.isbn = isbn;
     }

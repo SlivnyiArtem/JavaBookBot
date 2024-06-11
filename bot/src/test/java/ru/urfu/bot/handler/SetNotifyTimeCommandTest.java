@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import ru.urfu.bot.handler.commands.SetNotifyTimeCommandHandler;
+import ru.urfu.bot.command.SetNotifyTimeCommand;
 import ru.urfu.bot.service.ChatUserService;
 
 import java.util.List;
@@ -17,16 +17,16 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 /**
- * Тест на класс {@link ru.urfu.bot.handler.commands.SetNotifyTimeCommandHandler}
+ * Тест на класс {@link SetNotifyTimeCommand}
  */
 @ExtendWith(MockitoExtension.class)
-public class SetNotifyTimeCommandHandlerTest {
+public class SetNotifyTimeCommandTest {
 
     @Mock
     private ChatUserService chatUserService;
 
     @InjectMocks
-    private SetNotifyTimeCommandHandler setNotifyTimeCommandHandler;
+    private SetNotifyTimeCommand setNotifyTimeCommand;
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private Update update;
@@ -48,15 +48,15 @@ public class SetNotifyTimeCommandHandlerTest {
         when(update.getMessage().getChat().getId()).thenReturn(chatId);
         when(update.getMessage().getChat().getUserName()).thenReturn(username);
 
-        assertTrue(setNotifyTimeCommandHandler.canHandle(update));
-        List<SendMessage> actual = setNotifyTimeCommandHandler.process(update);
+        assertTrue(setNotifyTimeCommand.canHandle(update));
+        List<SendMessage> actual = setNotifyTimeCommand.process(update);
         assertEquals("Установленно время для получения уведомлений", actual.getFirst().getText());
 
         when(update.getMessage().getText()).thenReturn("/set_time 00:00+01:00");
-        assertTrue(setNotifyTimeCommandHandler.canHandle(update));
+        assertTrue(setNotifyTimeCommand.canHandle(update));
 
         when(update.getMessage().getText()).thenReturn("/set_time 00:00-18:00");
-        assertTrue(setNotifyTimeCommandHandler.canHandle(update));
+        assertTrue(setNotifyTimeCommand.canHandle(update));
     }
 
     /**
@@ -70,26 +70,26 @@ public class SetNotifyTimeCommandHandlerTest {
         when(update.getMessage().getChat().getId()).thenReturn(chatId);
         when(update.getMessage().getChat().getUserName()).thenReturn(username);
 
-        assertFalse(setNotifyTimeCommandHandler.canHandle(update));
-        assertTrue(setNotifyTimeCommandHandler.process(update).isEmpty());
+        assertFalse(setNotifyTimeCommand.canHandle(update));
+        assertTrue(setNotifyTimeCommand.process(update).isEmpty());
 
         when(update.getMessage().getText()).thenReturn("/set_time 24:00:59+01:00");
-        assertEquals(INTERNAL_SERVER_ERROR, setNotifyTimeCommandHandler.process(update).getFirst().getText());
+        assertEquals(INTERNAL_SERVER_ERROR, setNotifyTimeCommand.process(update).getFirst().getText());
 
         when(update.getMessage().getText()).thenReturn("/set_time 23:80:59+01:00");
-        assertEquals(INTERNAL_SERVER_ERROR, setNotifyTimeCommandHandler.process(update).getFirst().getText());
+        assertEquals(INTERNAL_SERVER_ERROR, setNotifyTimeCommand.process(update).getFirst().getText());
 
         when(update.getMessage().getText()).thenReturn("/set_time 23:50:70+01:00");
-        assertEquals(INTERNAL_SERVER_ERROR, setNotifyTimeCommandHandler.process(update).getFirst().getText());
+        assertEquals(INTERNAL_SERVER_ERROR, setNotifyTimeCommand.process(update).getFirst().getText());
 
         when(update.getMessage().getText()).thenReturn("/set_time 00:00:00");
-        assertEquals(INTERNAL_SERVER_ERROR, setNotifyTimeCommandHandler.process(update).getFirst().getText());
+        assertEquals(INTERNAL_SERVER_ERROR, setNotifyTimeCommand.process(update).getFirst().getText());
 
         when(update.getMessage().getText()).thenReturn("/set_time 00:00+20:00");
-        assertEquals(INTERNAL_SERVER_ERROR, setNotifyTimeCommandHandler.process(update).getFirst().getText());
+        assertEquals(INTERNAL_SERVER_ERROR, setNotifyTimeCommand.process(update).getFirst().getText());
 
         when(update.getMessage().getText()).thenReturn("/set_time ffffff");
-        assertEquals(INTERNAL_SERVER_ERROR, setNotifyTimeCommandHandler.process(update).getFirst().getText());
+        assertEquals(INTERNAL_SERVER_ERROR, setNotifyTimeCommand.process(update).getFirst().getText());
     }
 
     /**
@@ -99,8 +99,8 @@ public class SetNotifyTimeCommandHandlerTest {
     public void notCommandUpdateTest() {
         when(update.hasMessage()).thenReturn(false);
 
-        assertFalse(setNotifyTimeCommandHandler.canHandle(update));
-        List<SendMessage> actual = setNotifyTimeCommandHandler.process(update);
+        assertFalse(setNotifyTimeCommand.canHandle(update));
+        List<SendMessage> actual = setNotifyTimeCommand.process(update);
         assertTrue(actual.isEmpty());
     }
 
@@ -115,8 +115,8 @@ public class SetNotifyTimeCommandHandlerTest {
         when(update.getMessage().getChat().getId()).thenReturn(null);
         when(update.getMessage().getChat().getUserName()).thenReturn("");
 
-        assertFalse(setNotifyTimeCommandHandler.canHandle(update));
-        List<SendMessage> actual = setNotifyTimeCommandHandler.process(update);
+        assertFalse(setNotifyTimeCommand.canHandle(update));
+        List<SendMessage> actual = setNotifyTimeCommand.process(update);
         assertTrue(actual.isEmpty());
     }
 
@@ -130,8 +130,8 @@ public class SetNotifyTimeCommandHandlerTest {
         when(update.getMessage().getText()).thenReturn(null);
         when(update.getMessage().getChat()).thenReturn(null);
 
-        assertFalse(setNotifyTimeCommandHandler.canHandle(update));
-        List<SendMessage> actual = setNotifyTimeCommandHandler.process(update);
+        assertFalse(setNotifyTimeCommand.canHandle(update));
+        List<SendMessage> actual = setNotifyTimeCommand.process(update);
         assertTrue(actual.isEmpty());
     }
 }

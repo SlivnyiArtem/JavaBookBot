@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import ru.urfu.bot.handler.commands.StartBotCommandHandler;
+import ru.urfu.bot.command.StartCommand;
 import ru.urfu.bot.service.ChatUserService;
 
 import java.util.List;
@@ -18,16 +18,16 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 /**
- * Тест на класс {@link StartBotCommandHandler}
+ * Тест на класс {@link StartCommand}
  */
 @ExtendWith(MockitoExtension.class)
-public class StartBotCommandHandlerTest {
+public class StartCommandTest {
 
     @Mock
     private ChatUserService chatUserService;
 
     @InjectMocks
-    private StartBotCommandHandler startBotCommandHandler;
+    private StartCommand startCommand;
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private Update update;
@@ -56,13 +56,13 @@ public class StartBotCommandHandlerTest {
         when(update.getMessage().getChat().getUserName()).thenReturn(username);
 
         when(chatUserService.addUserChatIfAbsent(eq(username), eq(chatId))).thenReturn(true);
-        assertTrue(startBotCommandHandler.canHandle(update));
-        List<SendMessage> actual = startBotCommandHandler.process(update);
+        assertTrue(startCommand.canHandle(update));
+        List<SendMessage> actual = startCommand.process(update);
         assertEquals(HELP_MESSAGE, actual.getFirst().getText());
 
         when(chatUserService.addUserChatIfAbsent(eq(username), eq(chatId))).thenReturn(false);
-        assertTrue(startBotCommandHandler.canHandle(update));
-        actual = startBotCommandHandler.process(update);
+        assertTrue(startCommand.canHandle(update));
+        actual = startCommand.process(update);
         assertTrue(actual.isEmpty());
     }
 
@@ -73,8 +73,8 @@ public class StartBotCommandHandlerTest {
     public void notCommandUpdateTest() {
         when(update.hasMessage()).thenReturn(false);
 
-        assertFalse(startBotCommandHandler.canHandle(update));
-        List<SendMessage> actual = startBotCommandHandler.process(update);
+        assertFalse(startCommand.canHandle(update));
+        List<SendMessage> actual = startCommand.process(update);
         assertTrue(actual.isEmpty());
     }
 
@@ -89,8 +89,8 @@ public class StartBotCommandHandlerTest {
         when(update.getMessage().getChat().getId()).thenReturn(null);
         when(update.getMessage().getChat().getUserName()).thenReturn("");
 
-        assertFalse(startBotCommandHandler.canHandle(update));
-        List<SendMessage> actual = startBotCommandHandler.process(update);
+        assertFalse(startCommand.canHandle(update));
+        List<SendMessage> actual = startCommand.process(update);
         assertTrue(actual.isEmpty());
     }
 
@@ -104,8 +104,8 @@ public class StartBotCommandHandlerTest {
         when(update.getMessage().getText()).thenReturn(null);
         when(update.getMessage().getChat()).thenReturn(null);
 
-        assertFalse(startBotCommandHandler.canHandle(update));
-        List<SendMessage> actual = startBotCommandHandler.process(update);
+        assertFalse(startCommand.canHandle(update));
+        List<SendMessage> actual = startCommand.process(update);
         assertTrue(actual.isEmpty());
     }
 }
